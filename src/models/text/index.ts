@@ -6,7 +6,7 @@ interface TextProps extends ElementProps {
   fontSize: number
 }
 
-interface Typography extends Elements {
+export interface Typography extends Elements {
   getContent(): string
   setContent(content: string): void
 
