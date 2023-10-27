@@ -120,6 +120,10 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
   const onLoadImg = (e: any) => {
     const currentfiles = e.target.files
 
+    if (currentfiles.length() === 0) {
+      return
+    }
+
     const img = new Image()
     img.src = URL.createObjectURL(currentfiles[0])
     img.onload = () => {
