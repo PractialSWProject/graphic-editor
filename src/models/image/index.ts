@@ -4,7 +4,7 @@ interface ImageProps extends ElementProps {
   imageUrl: string
 }
 
-interface Image extends Elements {
+export interface Image extends Elements {
   getImageUrl(): string
   setImageUrl(url: string): void
 }
