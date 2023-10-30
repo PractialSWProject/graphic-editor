@@ -15,6 +15,7 @@ export interface ElementProps {
   position: Position
   size: Size
   zIndex: ZIndex
+  selected: boolean
 }
 
 // Abstract Elements interface
@@ -27,10 +28,14 @@ export interface Elements {
 
   getSize(): Size
   setSize(props: Size): void
+
+  getSelected(): boolean
+  setSelected(selected: boolean): void
 }
 
+
 export class ConcreteElements implements Elements {
-  constructor(private position: Position, private size: Size, private zIndex: ZIndex) {}
+  constructor(private position: Position, private size: Size, private zIndex: ZIndex, private selected = false) {}
 
   getPosition(): Position {
     return { x: this.position.x, y: this.position.y }
@@ -57,4 +62,13 @@ export class ConcreteElements implements Elements {
     this.size.width = props.width
     this.size.height = props.height
   }
+
+  getSelected(): boolean {
+    return this.selected;
+  }
+
+  setSelected(selected: boolean): void {
+    this.selected = selected;
+  } 
 }
+

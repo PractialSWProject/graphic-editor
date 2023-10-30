@@ -10,11 +10,12 @@ import image from '../../assets/image.svg'
 import { FilledShapeConcreteFactory, OutlinedShapeConcreteFactory } from '../../models/shapes/variants'
 import { TextConcreteFactory } from '../../models/text'
 import { ImageConcreteFactory } from '../../models/image'
-import { ImageElementT, ShapeElementT, TextElementT, VariantT } from '../type'
+import { ElementT, ImageElementT, ShapeElementT, TextElementT, VariantT } from '../type'
 import { DEFAULT_POS, DEFAULT_SIZE, DEFAULT_COLOR, DEFAULT_FONTSIZE } from '../constants'
 import OptionWindow from './OptionWindow'
 import Button from './Button'
 import TextInput from './TextInput'
+import CreationManager from '../../models/composite/created'
 
 let ZINDEX = 0
 let ID = 1
@@ -30,9 +31,11 @@ interface ToolBarProps {
   setLines: (newLine: ShapeElementT) => void
   setTexts: (newText: TextElementT) => void
   setImages: (newImage: ImageElementT) => void
+  setElements: (newElements: ElementT) => void
+  creationManager: CreationManager
 }
 
-function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolBarProps) {
+function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages, setElements, creationManager }: ToolBarProps) {
   const [rectOptionOpen, setRectOptionOpen] = useState(false)
   const [ellipseOptionOpen, setEllipseOptionOpen] = useState(false)
   const [textInputOpen, setTextInputOpen] = useState(false)
@@ -40,7 +43,7 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
   const imgInputRef = useRef<HTMLInputElement>(null)
 
   const createRectangle = (variant: VariantT) => {
-    const newRect = {
+    const newRect: ShapeElementT = {
       id: ID++,
       variant,
       shape:
@@ -49,18 +52,22 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
               position: { ...DEFAULT_POS },
               size: { ...DEFAULT_SIZE },
               color: DEFAULT_COLOR,
-              zIndex: ZINDEX++
+              zIndex: ZINDEX++,
+              selected: false
             })
           : outlinedShapeFactory.createRectangle({
               position: { ...DEFAULT_POS },
               size: { ...DEFAULT_SIZE },
               color: DEFAULT_COLOR,
-              zIndex: ZINDEX++
+              zIndex: ZINDEX++,
+              selected: false
             })
     }
-
-    setRects(newRect)
+    creationManager.create(newRect)
+    setElements(newRect)
+    // setRects(newRect)
   }
+  console.log(creationManager.get())
 
   const createEllipse = (variant: VariantT) => {
     const newEllipse = {
@@ -72,13 +79,15 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
               position: { ...DEFAULT_POS },
               size: { ...DEFAULT_SIZE },
               color: DEFAULT_COLOR,
-              zIndex: ZINDEX++
+              zIndex: ZINDEX++,
+              selected: false
             })
           : outlinedShapeFactory.createEllipse({
               position: { ...DEFAULT_POS },
               size: { ...DEFAULT_SIZE },
               color: DEFAULT_COLOR,
-              zIndex: ZINDEX++
+              zIndex: ZINDEX++,
+              selected: false
             })
     }
 
@@ -93,7 +102,8 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
         position: { ...DEFAULT_POS },
         size: { ...DEFAULT_SIZE },
         color: DEFAULT_COLOR,
-        zIndex: ZINDEX++
+        zIndex: ZINDEX++,
+        selected: false
       })
     }
 
@@ -109,7 +119,8 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
         content: textInput,
         textColor: DEFAULT_COLOR,
         fontSize: DEFAULT_FONTSIZE,
-        zIndex: ZINDEX++
+        zIndex: ZINDEX++,
+        selected: false
       })
     }
 
@@ -120,7 +131,7 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
   const onLoadImg = (e: any) => {
     const currentfiles = e.target.files
 
-    if (currentfiles.length() === 0) {
+    if (currentfiles.length === 0) {
       return
     }
 
@@ -133,7 +144,8 @@ function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages }: ToolB
           position: { ...DEFAULT_POS },
           size: { width: 150, height: 150 * (img.height / img.width) },
           imageUrl: img.src,
-          zIndex: ZINDEX++
+          zIndex: ZINDEX++,
+          selected: false
         })
       }
 

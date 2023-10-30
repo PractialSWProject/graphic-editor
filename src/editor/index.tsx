@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Stage, Layer } from 'react-konva'
 import { Box } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import { ShapeElementT, TextElementT, ImageElementT } from './type'
+import { ShapeElementT, TextElementT, ImageElementT, ElementT } from './type'
 import RectView from './ElementView/RectView'
 import EllipseView from './ElementView/EllipseView'
 import TextView from './ElementView/TextView'
@@ -10,6 +10,10 @@ import LineView from './ElementView/LineView'
 import ImageView from './ElementView/ImageView'
 import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
+import SelectionManager from '../models/composite/selected'
+import CreationManager from '../models/composite/created'
+
+const creationManager = new CreationManager()
 
 function Editor() {
   const [rects, setRects] = useState<ShapeElementT[]>([])
@@ -17,6 +21,10 @@ function Editor() {
   const [lines, setLines] = useState<ShapeElementT[]>([])
   const [texts, setTexts] = useState<TextElementT[]>([])
   const [images, setImages] = useState<ImageElementT[]>([])
+
+  const [elements, setElements] = useState<ElementT[]>([])
+  
+  const selectionManager = new SelectionManager()
 
   const rows = useMemo(() => {
     const rectRows = rects.map(el => {
@@ -110,6 +118,10 @@ function Editor() {
     setImages([...images, newImage])
   }
 
+  const handleCreateElements = (newElement: ElementT) => {
+    // setElements([...elements, newElement])
+  }
+
   return (
     <Box sx={{ width: '100vw', height: '100vh', display: 'flex' }}>
       <Box sx={{ width: '70vw', height: '100vh' }}>
@@ -119,6 +131,8 @@ function Editor() {
           setLines={handleUpdateLine}
           setTexts={handleUpdateText}
           setImages={handleUpdateImage}
+          setElements={handleCreateElements}
+          creationManager={creationManager}
         />
         <Box
           sx={{
@@ -135,7 +149,12 @@ function Editor() {
             style={{ display: 'inline-block', border: '1px solid gray', background: 'white' }}
           >
             <Layer>
-              <RectView rects={rects} setRects={setRects} />
+              <RectView
+                elements={elements}
+                setElements={setElements}
+                selectionManager={selectionManager}
+                creationManager={creationManager}
+              />
               <EllipseView ellipses={ellipses} setEllipses={setEllipses} />
               <TextView texts={texts} setTexts={setTexts} />
               <LineView lines={lines} setLines={setLines} />

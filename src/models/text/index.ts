@@ -23,8 +23,8 @@ interface TextFactory {
 }
 
 export class TextConcreteFactory implements TextFactory {
-  createText({ position, size, zIndex, content, textColor, fontSize }: TextProps): Typography {
-    return new ConcreteText(position, size, zIndex, content, textColor, fontSize)
+  createText({ position, size, zIndex, selected, content, textColor, fontSize }: TextProps): Typography {
+    return new ConcreteText(position, size, zIndex, selected, content, textColor, fontSize)
   }
 }
 
@@ -33,6 +33,7 @@ class ConcreteText extends ConcreteElements implements Typography {
     position: Position,
     size: Size,
     zIndex: ZIndex,
+    selected: boolean,
     private content: string,
     private textColor: Color,
     private fontSize: number

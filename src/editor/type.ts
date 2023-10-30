@@ -19,3 +19,5 @@ export interface ImageElementT {
 }
 
 export type VariantT = 'filled' | 'outlined'
+
+export type ElementT = ShapeElementT | TextElementT | ImageElementT;

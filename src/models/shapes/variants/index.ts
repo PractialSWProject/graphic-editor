@@ -16,30 +16,30 @@ interface FilledShapeFactory {
 
 // Concrete factory for Outlined Shapes
 export class OutlinedShapeConcreteFactory implements OutlinedShapeFactory {
-  createRectangle({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteRectangle(position, size, zIndex, color)
+  createRectangle({ position, size, zIndex, selected, color }: ShapeProps): Shapes {
+    return new ConcreteRectangle(position, size, zIndex, selected, color)
   }
 
-  createEllipse({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteEllipse(position, size, zIndex, color)
+  createEllipse({ position, size, zIndex, selected, color }: ShapeProps): Shapes {
+    return new ConcreteEllipse(position, size, zIndex, selected, color)
   }
 
-  createLine({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteLine(position, size, zIndex, color)
+  createLine({ position, size, zIndex, selected, color }: ShapeProps): Shapes {
+    return new ConcreteLine(position, size, zIndex, selected, color)
   }
 }
 
 // Concrete factory for Filled Shapes
 export class FilledShapeConcreteFactory implements FilledShapeFactory {
-  createRectangle({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteRectangle(position, size, zIndex, color)
+  createRectangle({ position, size, zIndex, selected, color }: ShapeProps): Shapes {
+    return new ConcreteRectangle(position, size, zIndex, selected, color)
   }
 
-  createEllipse({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteEllipse(position, size, zIndex, color)
+  createEllipse({ position, size, zIndex,selected,  color }: ShapeProps): Shapes {
+    return new ConcreteEllipse(position, size, zIndex, selected, color)
   }
 
-  createLine({ position, size, zIndex, color }: ShapeProps): Shapes {
-    return new ConcreteLine(position, size, zIndex, color)
+  createLine({ position, size, zIndex, selected, color }: ShapeProps): Shapes {
+    return new ConcreteLine(position, size, zIndex, selected, color)
   }
 }

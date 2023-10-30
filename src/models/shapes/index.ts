@@ -15,9 +15,10 @@ class ConcreteShape extends ConcreteElements implements Shapes {
     position: Position,
     size: Size,
     zIndex: ZIndex,
+    selected: boolean,
     private color: Color
   ) {
-    super(position, size, zIndex)
+    super(position, size, zIndex, selected)
   }
 
   getColor(): Color {

@@ -29,7 +29,7 @@ function OptionWindow({ left, outlinedImg, filledImg, createElement, closeWindow
   }, [ref, closeWindow])
 
   return (
-    <Wrapper left={left} ref={ref}>
+    <Wrapper as="div" left={left} ref={ref}>
       <Triangle />
       <Window>
         <Option

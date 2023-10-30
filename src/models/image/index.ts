@@ -15,8 +15,8 @@ interface ImageFactory {
 }
 
 export class ImageConcreteFactory implements ImageFactory {
-  createImage({ position, size, zIndex, imageUrl }: ImageProps): Image {
-    return new ConcreteImage(position, size, zIndex, imageUrl)
+  createImage({ position, size, zIndex, selected, imageUrl }: ImageProps): Image {
+    return new ConcreteImage(position, size, zIndex, selected, imageUrl)
   }
 }
 
@@ -25,9 +25,10 @@ class ConcreteImage extends ConcreteElements implements Image {
     position: Position,
     size: Size,
     zIndex: ZIndex,
+    selected: boolean,
     private imageUrl: string
   ) {
-    super(position, size, zIndex)
+    super(position, size, zIndex, selected)
   }
 
   getImageUrl(): string {
