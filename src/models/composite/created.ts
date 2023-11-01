@@ -101,6 +101,16 @@ class CreatedComposite {
     this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
   }
 
+  updateZIndex(id: number, zIndex: number) {
+    this.created.forEach(element => {
+      if (element.id === id) {
+        element.properties.zIndex = zIndex
+      }
+    })
+    this.notifyLayerChanges()
+    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+  }
+
   getRectangles(): Array<Rectangle> {
     return this.created.filter(el => el instanceof Rectangle) as Array<Rectangle>
   }

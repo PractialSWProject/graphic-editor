@@ -19,6 +19,7 @@ abstract class Elements {
 
   constructor(id: number) {
     this.id = id
+    this.properties.zIndex = id
   }
 
   abstract create(): void

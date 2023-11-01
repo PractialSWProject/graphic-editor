@@ -51,6 +51,7 @@ const EllipseView = ({ createdComposite, handleMove, handleEnlarge, shapeRef, tr
             shadowEnabled={el.selected ? true : false}
             onDragEnd={e => handleMove(e)}
             onTransformEnd={e => handleEnlarge(e)}
+            zIndex={el.properties.zIndex}
             draggable
           />
         </Group>

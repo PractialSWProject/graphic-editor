@@ -31,8 +31,8 @@ const RectView = ({ createdComposite, handleMove }: Props) => {
             shadowBlur={10}
             shadowColor="lime"
             shadowEnabled={el.selected ? true : false}
-            // zIndex={el.properties.zIndex}
             onDragEnd={e => handleMove(e)}
+            zIndex={el.properties.zIndex}
             draggable
           />
         </Group>

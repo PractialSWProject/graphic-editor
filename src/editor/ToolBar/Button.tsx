@@ -16,7 +16,7 @@ function Button({ icon, children, onClick }: Props) {
   )
 }
 
-export const ButtonWrapper = styled.div`
+const ButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

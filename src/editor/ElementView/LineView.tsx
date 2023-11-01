@@ -5,7 +5,7 @@ import { KonvaEventObject } from 'konva/lib/Node'
 
 interface Props {
   createdComposite: CreatedComposite
-  handleMove:  (e: KonvaEventObject<DragEvent>) => void
+  handleMove: (e: KonvaEventObject<DragEvent>) => void
 }
 
 const LineView = ({ createdComposite, handleMove }: Props) => {
@@ -37,6 +37,7 @@ const LineView = ({ createdComposite, handleMove }: Props) => {
             stroke={el.properties.color}
             strokeWidth={5}
             onDragEnd={e => handleMove(e)}
+            zIndex={el.properties.zIndex}
             draggable
           />
         </Group>
