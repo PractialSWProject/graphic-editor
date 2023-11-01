@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import CreatedComposite from '../../models/composite/created'
 import { useState } from 'react'

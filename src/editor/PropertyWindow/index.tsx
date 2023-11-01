@@ -8,6 +8,7 @@ interface Props {
 }
 
 function PropertyWindow({ createdComposite }: Props) {
+  
   const [isOpenPalette, setIsOpenPalette] = useState(false)
   const [updateProperty, setUpdateProperty] = useState(false)
 
@@ -24,6 +25,24 @@ function PropertyWindow({ createdComposite }: Props) {
 
   const handleChangeColor = (color: { hex: string }) => {
     createdComposite.updateColor(selected[0].id, color.hex)
+  }
+
+  const handleChangePosition = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, xy: string) => {
+    const newXY = parseFloat(e.target.value)
+    if (!isNaN(newXY)) {
+      const currentPosition = selected[0].properties.position
+      const newPosition = xy === 'x' ? { ...currentPosition, x: newXY } : { ...currentPosition, y: newXY }
+      createdComposite.updatePosition(selected[0].id, newPosition)
+    }
+  }
+
+  const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, wh: string) => {
+    const newWH = parseFloat(e.target.value)
+    if (!isNaN(newWH)) {
+      const currentPosition = selected[0].properties.size
+      const newSize = wh === 'height' ? { ...currentPosition, height: newWH } : { ...currentPosition, width: newWH }
+      createdComposite.updateSize(selected[0].id, newSize)
+    }
   }
 
   return (
@@ -43,6 +62,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
+                onChange={e => handleChangePosition(e, 'x')}
                 value={selected.length === 1 && Math.floor(selected[0].properties.position.x)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
@@ -59,6 +79,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
+                onChange={e => handleChangePosition(e, 'y')}
                 value={selected.length === 1 && Math.floor(selected[0].properties.position.y)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
@@ -77,6 +98,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
+                onChange={e => handleChangeSize(e, 'width')}
                 value={selected.length === 1 && Math.floor(selected[0].properties.size.width)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
@@ -93,6 +115,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
+                onChange={e => handleChangeSize(e, 'height')}
                 value={selected.length === 1 && Math.floor(selected[0].properties.size.height)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
@@ -112,7 +135,8 @@ function PropertyWindow({ createdComposite }: Props) {
                   height: 20,
                   backgroundColor: selected.length === 1 ? selected[0].properties.color : '#FFF',
                   borderRadius: 2,
-                  mr: 2
+                  mr: 2,
+                  border: '0.5px solid white'
                 }}
                 onClick={handleOpenPalette}
               />

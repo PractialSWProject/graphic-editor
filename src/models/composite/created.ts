@@ -2,7 +2,7 @@ import Elements from '../Elements'
 import Ellipse from '../Elements/Shapes/ellipse'
 import Line from '../Elements/Shapes/line'
 import Rectangle from '../Elements/Shapes/rectangle'
-import { Position } from '../base'
+import { Position, Size } from '../base'
 
 type ChangeListener = () => void
 
@@ -81,12 +81,23 @@ class CreatedComposite {
     this.notifyPropertyWindowChanges()
   }
 
+  updateSize(id: number, size: Size) {
+    this.created.forEach(element => {
+      if (element.id === id) {
+        element.properties.size = size
+      }
+    })
+
+    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyPropertyWindowChanges()
+  }
   updateColor(id: number, color: string) {
     this.created.forEach(element => {
       if (element.id === id) {
         element.properties.color = color
       }
     })
+    this.notifyPropertyWindowChanges()
     this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
   }
 

@@ -8,7 +8,7 @@ import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
 import LayerWindow from './LayerWindow'
 import { KonvaEventObject } from 'konva/lib/Node'
-import { DEFAULT_POS } from './constants'
+import { DEFAULT_POS } from '../models/base'
 
 const createdComposite = new CreatedComposite()
 
