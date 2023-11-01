@@ -76,6 +76,9 @@ class CreatedComposite {
         element.properties.position = position
       }
     })
+
+    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyPropertyWindowChanges()
   }
 
   updateColor(id: number, color: string) {

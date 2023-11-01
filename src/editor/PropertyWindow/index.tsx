@@ -43,7 +43,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
-                value={selected.length === 1 && selected[0].properties.position.x}
+                value={selected.length === 1 && Math.floor(selected[0].properties.position.x)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -55,11 +55,11 @@ function PropertyWindow({ createdComposite }: Props) {
               </Typography>
               <TextField
                 size="small"
-                disabled={selected.length > 1 ? true : false}
+                disabled={selected.length !== 1}
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
-                value={selected.length === 1 && selected[0].properties.position.y}
+                value={selected.length === 1 && Math.floor(selected[0].properties.position.y)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -73,11 +73,11 @@ function PropertyWindow({ createdComposite }: Props) {
               </Typography>
               <TextField
                 size="small"
-                disabled={selected.length > 1 ? true : false}
+                disabled={selected.length !== 1}
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
-                value={selected.length === 1 && selected[0].properties.size.width}
+                value={selected.length === 1 && Math.floor(selected[0].properties.size.width)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -89,11 +89,11 @@ function PropertyWindow({ createdComposite }: Props) {
               </Typography>
               <TextField
                 size="small"
-                disabled={selected.length > 1 ? true : false}
+                disabled={selected.length !== 1}
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
-                value={selected.length === 1 && selected[0].properties.size.height}
+                value={selected.length === 1 && Math.floor(selected[0].properties.size.height)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
