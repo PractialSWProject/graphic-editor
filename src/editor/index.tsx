@@ -66,21 +66,21 @@ function Editor() {
     })
   }
 
-  // TODO...........
   const handleEnlarge = (e: KonvaEventObject<Event>) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
 
-    const scaledX = e.target.attrs.scaleX
-    const scaledY = e.target.attrs.scaleY
-
-    console.log(scaledX, scaledY)
+    const scaledX = e.currentTarget.scaleX()
+    const scaledY = e.currentTarget.scaleX()
 
     createdComposite.getSelected().forEach(el => {
-      const newWidth = DEFAULT_SIZE.width * scaledX
-      const newHeight = DEFAULT_SIZE.height * scaledY
+      const newWidth = el.properties.size.width * scaledX
+      const newHeight = el.properties.size.height * scaledY
 
       createdComposite.updateSize(el.id, { width: newWidth, height: newHeight })
     })
+
+    e.currentTarget.scaleX(1)
+    e.currentTarget.scaleY(1)
   }
 
   return (
