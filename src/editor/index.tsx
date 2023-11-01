@@ -7,11 +7,45 @@ import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
 import LayerWindow from './LayerWindow'
+import { KonvaEventObject } from 'konva/lib/Node'
+import { DEFAULT_POS } from './constants'
 
 const createdComposite = new CreatedComposite()
 
 function Editor() {
-  const handleClickElseWhere = () => {}
+  const handleClick = (e: KonvaEventObject<MouseEvent>) => {
+    console.log(e.target)
+    const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
+    if (e.evt.shiftKey) {
+      if (element) {
+        if (createdComposite.isInSelectionManager(element)) {
+          createdComposite.deselect(element)
+        } else {
+          createdComposite.select(element)
+        }
+      }
+    } else {
+      if (element) {
+        createdComposite.deselectAll()
+        createdComposite.select(element)
+      } else {
+        createdComposite.deselectAll()
+      }
+    }
+  }
+
+  const handleMove = (e: KonvaEventObject<DragEvent>) => {
+    const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
+    const movedX = (element?.properties.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
+    const movedY = (element?.properties.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
+
+    createdComposite.getSelected().forEach(el => {
+      const newX = el.properties.position.x - movedX
+      const newY = el.properties.position.y - movedY
+
+      createdComposite.updatePosition(el.id, { x: newX, y: newY })
+    })
+  }
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', display: 'flex' }}>
@@ -30,11 +64,12 @@ function Editor() {
             width={500}
             height={500}
             style={{ display: 'inline-block', border: '1px solid gray', background: 'white' }}
+            onClick={e => handleClick(e)}
           >
             <Layer>
-              <RectView createdComposite={createdComposite} />
-              <EllipseView createdComposite={createdComposite} />
-              <LineView createdComposite={createdComposite} />
+              <RectView createdComposite={createdComposite} handleMove={handleMove} />
+              <EllipseView createdComposite={createdComposite} handleMove={handleMove} />
+              <LineView createdComposite={createdComposite} handleMove={handleMove} />
             </Layer>
           </Stage>
         </Box>

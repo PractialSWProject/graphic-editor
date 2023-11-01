@@ -16,7 +16,6 @@ function PropertyWindow({ createdComposite }: Props) {
   })
 
   const selected = createdComposite.getSelected()
-  console.log(selected)
 
   const handleOpenPalette = () => {
     if (selected.length > 1) return
@@ -101,26 +100,28 @@ function PropertyWindow({ createdComposite }: Props) {
           </Grid>
         </Grid>
         <Divider sx={{ borderColor: '#333' }} />
-        <Box padding={2}>
-          <Typography variant="body2" color={'#C7C7C7'}>
-            Fill
-          </Typography>
-          <Box mt={2} display={'flex'}>
-            <Box
-              sx={{
-                width: 20,
-                height: 20,
-                backgroundColor: selected.length === 1 ? selected[0].properties.color : '#FFF',
-                borderRadius: 2,
-                mr: 2
-              }}
-              onClick={handleOpenPalette}
-            />
-            <Typography variant="body1" marginRight={2} color={'#C7C7C7'}>
-              {selected.length === 0 ? '' : selected.length === 1 ? selected[0].properties.color : 'Mixed'}
+        {selected.length !== 0 && (
+          <Box padding={2}>
+            <Typography variant="body2" color={'#C7C7C7'}>
+              Fill
             </Typography>
+            <Box mt={2} display={'flex'}>
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: selected.length === 1 ? selected[0].properties.color : '#FFF',
+                  borderRadius: 2,
+                  mr: 2
+                }}
+                onClick={handleOpenPalette}
+              />
+              <Typography variant="body1" marginRight={2} color={'#C7C7C7'}>
+                {selected.length === 0 ? '' : selected.length === 1 ? selected[0].properties.color : 'Mixed'}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
       <Dialog open={isOpenPalette} onClose={() => setIsOpenPalette(false)}>
         <SketchPicker

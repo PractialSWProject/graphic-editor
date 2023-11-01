@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Group, Rect } from 'react-konva'
+import { KonvaEventObject } from 'konva/lib/Node'
 import CreatedComposite from '../../models/composite/created'
-import Rectangle from '../../models/Elements/Shapes/rectangle'
 
 interface Props {
   createdComposite: CreatedComposite
+  handleMove: (e: KonvaEventObject<DragEvent>) => void
 }
 
-const RectView = ({ createdComposite }: Props) => {
+const RectView = ({ createdComposite, handleMove }: Props) => {
   const [updateRectFlag, setUpdateRectFlag] = useState(false)
 
   createdComposite.listenForRectChanges(() => {
@@ -16,23 +17,12 @@ const RectView = ({ createdComposite }: Props) => {
 
   const rectangles = createdComposite.getRectangles()
 
-  const move = (id: number, x: number, y: number) => {
-    createdComposite.updatePosition(id, { x, y })
-  }
-
-  const handleClick = (el: Rectangle) => {
-    if (createdComposite.isInSelectionManager(el)) {
-      createdComposite.deselect(el)
-    } else {
-      createdComposite.select(el)
-    }
-  }
-
   return (
     <>
       {rectangles.map(el => (
         <Group key={el.id}>
           <Rect
+            id={el.id.toString()}
             x={el.properties.position.x}
             y={el.properties.position.y}
             width={el.properties.size.width}
@@ -42,10 +32,7 @@ const RectView = ({ createdComposite }: Props) => {
             shadowColor="lime"
             shadowEnabled={el.selected ? true : false}
             // zIndex={el.properties.zIndex}
-            onMouseDown={() => handleClick(el)}
-            onDragEnd={e => {
-              move(el.id, e.target.x(), e.target.y())
-            }}
+            onDragEnd={e => handleMove(e)}
             draggable
           />
         </Group>

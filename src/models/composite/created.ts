@@ -53,6 +53,11 @@ class CreatedComposite {
       element.setSelect(false)
     })
     this.selected = []
+
+    this.notifyEllipseChanges()
+    this.notifyLineChanges()
+    this.notifyRectChanges()
+    this.notifyPropertyWindowChanges()
   }
 
   isInSelectionManager(element: Elements): boolean {
