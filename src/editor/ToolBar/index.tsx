@@ -9,7 +9,7 @@ interface ToolBarProps {
   createdComposite: CreatedComposite
 }
 
-let ID = 0
+let ID = 1
 const elementFactory = new ElementFactory()
 
 function ToolBar({ createdComposite }: ToolBarProps) {

@@ -99,9 +99,9 @@ function PropertyWindow({ createdComposite }: Props) {
             </Box>
           </Grid>
         </Grid>
-        <Divider sx={{ borderColor: '#333' }} />
         {selected.length !== 0 && (
           <Box padding={2}>
+            <Divider sx={{ borderColor: '#333', mb: 2 }} />
             <Typography variant="body2" color={'#C7C7C7'}>
               Fill
             </Typography>

@@ -14,7 +14,6 @@ const createdComposite = new CreatedComposite()
 
 function Editor() {
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
-    console.log(e.target)
     const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
     if (e.evt.shiftKey) {
       if (element) {
@@ -75,7 +74,7 @@ function Editor() {
         </Box>
       </Box>
       <Box sx={{ width: '30vw', height: '100vh' }}>
-        <Box sx={{ height: '50vh' }}>
+        <Box sx={{ height: '50vh', backgroundColor: '#434343' }}>
           <PropertyWindow createdComposite={createdComposite} />
         </Box>
         <Box sx={{ height: '50vh' }}>

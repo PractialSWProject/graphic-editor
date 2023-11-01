@@ -1,7 +1,9 @@
 import { Box } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import CreatedComposite from '../../models/composite/created'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import LayerInfo from './LayerInfo'
+import Elements from '../../models/Elements'
 
 interface Props {
   createdComposite: CreatedComposite
@@ -16,21 +18,31 @@ const LayerWindow = ({ createdComposite }: Props) => {
     setUpdateLayers(!updateLayers)
   })
 
-  const rows = createdElements.map(el => ({
+  const rows = createdElements.map((el, index) => ({
     id: el.id,
-    color: el.properties.color
+    shape: el,
+    rowId: index,
+    name: el
   }))
 
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 30 },
-    { field: 'type', headerType: 'TYPE', width: 120 },
+  const columns: GridColDef[] = [
     {
-      field: 'color',
-      headerName: 'COLOR',
-      width: 100
+      field: 'shape',
+      width: 25,
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+        <LayerInfo element={params.value} isIcon />
+      )
+    },
+    {
+      field: 'name',
+      width: 200,
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+        <LayerInfo element={params.value} />
+      )
     }
   ]
-  return <DataGrid rows={rows} columns={columns} hideFooter />
+
+  return <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />
 }
 
 export default LayerWindow
