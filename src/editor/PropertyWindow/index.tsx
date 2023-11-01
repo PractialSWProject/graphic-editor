@@ -19,11 +19,12 @@ function PropertyWindow({ createdComposite }: Props) {
   console.log(selected)
 
   const handleOpenPalette = () => {
+    if (selected.length > 1) return
     setIsOpenPalette(isOpenPalette => !isOpenPalette)
   }
 
-  const handleChangeColor = () => {
-    createdComposite.updateColor(selected[0].id, '#FFF')
+  const handleChangeColor = (color: { hex: string }) => {
+    createdComposite.updateColor(selected[0].id, color.hex)
   }
 
   return (
@@ -44,7 +45,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 value={selected.length === 1 && selected[0].properties.position.x}
-                sx={{ backgroundColor: selected.length > 1 ? '#CCC' : undefined }}
+                sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
@@ -60,6 +61,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 value={selected.length === 1 && selected[0].properties.position.y}
+                sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
@@ -77,6 +79,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 value={selected.length === 1 && selected[0].properties.size.width}
+                sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
@@ -92,6 +95,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 value={selected.length === 1 && selected[0].properties.size.height}
+                sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
@@ -119,7 +123,10 @@ function PropertyWindow({ createdComposite }: Props) {
         </Box>
       </Box>
       <Dialog open={isOpenPalette} onClose={() => setIsOpenPalette(false)}>
-        <SketchPicker color={selected.length ? selected[0].properties.color : '#FFF'} />
+        <SketchPicker
+          color={selected.length ? selected[0].properties.color : '#FFF'}
+          onChangeComplete={handleChangeColor}
+        />
       </Dialog>
     </Box>
   )

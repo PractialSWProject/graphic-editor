@@ -79,6 +79,7 @@ class CreatedComposite {
         element.properties.color = color
       }
     })
+    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
   }
 
   getRectangles(): Array<Rectangle> {
