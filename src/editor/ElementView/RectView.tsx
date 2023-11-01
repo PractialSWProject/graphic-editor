@@ -1,70 +1,54 @@
-import { Dispatch, SetStateAction } from 'react'
-import { Rect } from 'react-konva'
-import { ElementT, ShapeElementT } from '../type'
-import SelectionManager from '../../models/composite/selected'
-import CreationManager from '../../models/composite/created'
+import { useState } from 'react'
+import { Group, Rect } from 'react-konva'
+import CreatedComposite from '../../models/composite/created'
+import Rectangle from '../../models/Elements/Shapes/rectangle'
+
 interface Props {
-  elements: ElementT[]
-  setElements: Dispatch<SetStateAction<ElementT[]>>
-  selectionManager: SelectionManager
-  creationManager: CreationManager
+  createdComposite: CreatedComposite
 }
 
-const RectView = ({ elements, setElements, selectionManager, creationManager }: Props) => {
-  // const updatePosition = (id: number, x: number, y: number) => {
-  //   const newRectElement = rects.map(el => {
-  //     if (el.id === id) {
-  //       el.shape.setPosition({ x, y })
-  //       return {
-  //         id: el.id,
-  //         variant: el.variant,
-  //         shape: el.shape
-  //       }
-  //     } else {
-  //       return el
-  //     }
-  //   })
-  //   // setRects(newRectElement)
-  // }
+const RectView = ({ createdComposite }: Props) => {
+  const [updateRectFlag, setUpdateRectFlag] = useState(false)
 
-  const handleRectClick = (el: ShapeElementT) => {
-    if (selectionManager.isInSelectionManager(el)) {
-      console.log('removed')
-      el.shape.setSelected(false)
-      selectionManager.remove(el)
-      console.log(selectionManager.get())
-      console.log(selectionManager.isInSelectionManager(el))
-    } else {
-      console.log('added!')
-      el.shape.setSelected(true)
-      selectionManager.select(el)
-      console.log(selectionManager.get())
-      console.log(selectionManager.isInSelectionManager(el))
-    }
-  }
-  const rectangles = creationManager.get().filter((el): el is ShapeElementT => {
-    return 'variant' in el && (el.variant === 'filled' || el.variant === 'outlined')
+  createdComposite.listenForRectChanges(() => {
+    setUpdateRectFlag(!updateRectFlag)
   })
 
-  console.log('rectangles in creationManager:', rectangles)
+  const rectangles = createdComposite.getRectangles()
+
+  const move = (id: number, x: number, y: number) => {
+    createdComposite.updatePosition(id, { x, y })
+  }
+
+  const handleClick = (el: Rectangle) => {
+    if (createdComposite.isInSelectionManager(el)) {
+      createdComposite.deselect(el)
+    } else {
+      createdComposite.select(el)
+    }
+  }
+
   return (
     <>
       {rectangles.map(el => (
-        <Rect
-          key={el.id}
-          x={el.shape.getPosition().x}
-          y={el.shape.getPosition().y}
-          width={el.shape.getSize().width}
-          height={el.shape.getSize().height}
-          fill={el.variant === 'filled' ? el.shape.getColor() : undefined}
-          stroke={el.variant === 'outlined' ? el.shape.getColor() : undefined}
-          dash={selectionManager.isInSelectionManager(el) ? [5, 5] : undefined}
-          onMouseDown={() => handleRectClick(el)}
-          // onDragEnd={e => {
-          //   updatePosition(el.id, e.target.x(), e.target.y())
-          // }}
-          draggable
-        />
+        <Group key={el.id}>
+          <Rect
+            x={el.properties.position.x}
+            y={el.properties.position.y}
+            width={el.properties.size.width}
+            height={el.properties.size.height}
+            fill={el.properties.color}
+            shadowBlur={10}
+            shadowColor="lime"
+            shadowEnabled={el.selected ? true : false}
+            // zIndex={el.properties.zIndex}
+            onMouseDown={() => handleClick(el)}
+            onDragEnd={e => {
+              move(el.id, e.target.x(), e.target.y())
+            }}
+            draggable
+          />
+        </Group>
       ))}
     </>
   )

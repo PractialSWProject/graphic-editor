@@ -1,204 +1,41 @@
-import { useState, useRef } from 'react'
 import styled from 'styled-components'
 import outlinedEllipse from '../../assets/outlined_ellipse.svg'
-import filledEllipse from '../../assets/filled_ellipse.svg'
 import outlinedRectangle from '../../assets/outlined_rectangle.svg'
-import filledRectangle from '../../assets/filled_rectangle.svg'
 import line from '../../assets/line.svg'
-import text from '../../assets/text.svg'
-import image from '../../assets/image.svg'
-import { FilledShapeConcreteFactory, OutlinedShapeConcreteFactory } from '../../models/shapes/variants'
-import { TextConcreteFactory } from '../../models/text'
-import { ImageConcreteFactory } from '../../models/image'
-import { ElementT, ImageElementT, ShapeElementT, TextElementT, VariantT } from '../type'
-import { DEFAULT_POS, DEFAULT_SIZE, DEFAULT_COLOR, DEFAULT_FONTSIZE } from '../constants'
-import OptionWindow from './OptionWindow'
 import Button from './Button'
-import TextInput from './TextInput'
-import CreationManager from '../../models/composite/created'
-
-let ZINDEX = 0
-let ID = 1
-
-const filledShapeFactory = new FilledShapeConcreteFactory()
-const outlinedShapeFactory = new OutlinedShapeConcreteFactory()
-const textFactory = new TextConcreteFactory()
-const imageFactory = new ImageConcreteFactory()
-
+import CreatedComposite from '../../models/composite/created'
+import ElementFactory from '../../models/Elements/Factories/ElementFactory'
 interface ToolBarProps {
-  setRects: (newRect: ShapeElementT) => void
-  setEllipses: (newEllipse: ShapeElementT) => void
-  setLines: (newLine: ShapeElementT) => void
-  setTexts: (newText: TextElementT) => void
-  setImages: (newImage: ImageElementT) => void
-  setElements: (newElements: ElementT) => void
-  creationManager: CreationManager
+  createdComposite: CreatedComposite
 }
 
-function ToolBar({ setRects, setEllipses, setLines, setTexts, setImages, setElements, creationManager }: ToolBarProps) {
-  const [rectOptionOpen, setRectOptionOpen] = useState(false)
-  const [ellipseOptionOpen, setEllipseOptionOpen] = useState(false)
-  const [textInputOpen, setTextInputOpen] = useState(false)
-  const [textInput, setTextInput] = useState('')
-  const imgInputRef = useRef<HTMLInputElement>(null)
+let ID = 0
+const elementFactory = new ElementFactory()
 
-  const createRectangle = (variant: VariantT) => {
-    const newRect: ShapeElementT = {
-      id: ID++,
-      variant,
-      shape:
-        variant === 'filled'
-          ? filledShapeFactory.createRectangle({
-              position: { ...DEFAULT_POS },
-              size: { ...DEFAULT_SIZE },
-              color: DEFAULT_COLOR,
-              zIndex: ZINDEX++,
-              selected: false
-            })
-          : outlinedShapeFactory.createRectangle({
-              position: { ...DEFAULT_POS },
-              size: { ...DEFAULT_SIZE },
-              color: DEFAULT_COLOR,
-              zIndex: ZINDEX++,
-              selected: false
-            })
-    }
-    creationManager.create(newRect)
-    setElements(newRect)
-    // setRects(newRect)
+function ToolBar({ createdComposite }: ToolBarProps) {
+  const createEllipse = () => {
+    const ellipse = elementFactory.createEllipse(ID++)
+    createdComposite.create(ellipse)
   }
-  console.log(creationManager.get())
 
-  const createEllipse = (variant: VariantT) => {
-    const newEllipse = {
-      id: ID++,
-      variant,
-      shape:
-        variant === 'filled'
-          ? filledShapeFactory.createEllipse({
-              position: { ...DEFAULT_POS },
-              size: { ...DEFAULT_SIZE },
-              color: DEFAULT_COLOR,
-              zIndex: ZINDEX++,
-              selected: false
-            })
-          : outlinedShapeFactory.createEllipse({
-              position: { ...DEFAULT_POS },
-              size: { ...DEFAULT_SIZE },
-              color: DEFAULT_COLOR,
-              zIndex: ZINDEX++,
-              selected: false
-            })
-    }
-
-    setEllipses(newEllipse)
+  const createRectangle = () => {
+    const rectangle = elementFactory.createRectangle(ID++)
+    createdComposite.create(rectangle)
   }
 
   const createLine = () => {
-    const newLine = {
-      id: ID++,
-      variant: 'outlined' as VariantT,
-      shape: outlinedShapeFactory.createLine({
-        position: { ...DEFAULT_POS },
-        size: { ...DEFAULT_SIZE },
-        color: DEFAULT_COLOR,
-        zIndex: ZINDEX++,
-        selected: false
-      })
-    }
-
-    setLines(newLine)
-  }
-
-  const createText = () => {
-    const newText = {
-      id: ID++,
-      text: textFactory.createText({
-        position: { ...DEFAULT_POS },
-        size: { ...DEFAULT_SIZE },
-        content: textInput,
-        textColor: DEFAULT_COLOR,
-        fontSize: DEFAULT_FONTSIZE,
-        zIndex: ZINDEX++,
-        selected: false
-      })
-    }
-
-    setTexts(newText)
-    setTextInput('')
-  }
-
-  const onLoadImg = (e: any) => {
-    const currentfiles = e.target.files
-
-    if (currentfiles.length === 0) {
-      return
-    }
-
-    const img = new Image()
-    img.src = URL.createObjectURL(currentfiles[0])
-    img.onload = () => {
-      const newImg = {
-        id: ID++,
-        img: imageFactory.createImage({
-          position: { ...DEFAULT_POS },
-          size: { width: 150, height: 150 * (img.height / img.width) },
-          imageUrl: img.src,
-          zIndex: ZINDEX++,
-          selected: false
-        })
-      }
-
-      setImages(newImg)
-    }
+    const line = elementFactory.createLine(ID++)
+    createdComposite.create(line)
   }
 
   return (
     <ToolBarWrapper>
-      <Button icon={outlinedEllipse} onClick={() => setEllipseOptionOpen(true)} />
+      <Button icon={outlinedEllipse} onClick={createEllipse} />
       <Divider />
-      <Button icon={outlinedRectangle} onClick={() => setRectOptionOpen(true)} />
+      <Button icon={outlinedRectangle} onClick={createRectangle} />
       <Divider />
       <Button icon={line} onClick={createLine} />
       <Divider />
-      <Button icon={text} onClick={() => setTextInputOpen(true)} />
-      <Divider />
-      <Button icon={image} onClick={() => imgInputRef.current && imgInputRef.current.click()}>
-        <input
-          ref={imgInputRef}
-          type="file"
-          id="image"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={onLoadImg}
-        />
-      </Button>
-      {ellipseOptionOpen && (
-        <OptionWindow
-          left={10}
-          outlinedImg={outlinedEllipse}
-          filledImg={filledEllipse}
-          createElement={createEllipse}
-          closeWindow={() => setEllipseOptionOpen(false)}
-        />
-      )}
-      {rectOptionOpen && (
-        <OptionWindow
-          left={60}
-          outlinedImg={outlinedRectangle}
-          filledImg={filledRectangle}
-          createElement={createRectangle}
-          closeWindow={() => setRectOptionOpen(false)}
-        />
-      )}
-      {textInputOpen && (
-        <TextInput
-          input={textInput}
-          setInput={setTextInput}
-          createText={createText}
-          close={() => setTextInputOpen(false)}
-        />
-      )}
     </ToolBarWrapper>
   )
 }

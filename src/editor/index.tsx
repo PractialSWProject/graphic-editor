@@ -1,139 +1,22 @@
-import { useState, useMemo } from 'react'
 import { Stage, Layer } from 'react-konva'
 import { Box } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
-import { ShapeElementT, TextElementT, ImageElementT, ElementT } from './type'
 import RectView from './ElementView/RectView'
 import EllipseView from './ElementView/EllipseView'
-import TextView from './ElementView/TextView'
 import LineView from './ElementView/LineView'
-import ImageView from './ElementView/ImageView'
 import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
-import SelectionManager from '../models/composite/selected'
-import CreationManager from '../models/composite/created'
+import CreatedComposite from '../models/composite/created'
+import LayerWindow from './LayerWindow'
 
-const creationManager = new CreationManager()
+const createdComposite = new CreatedComposite()
 
 function Editor() {
-  const [rects, setRects] = useState<ShapeElementT[]>([])
-  const [ellipses, setEllipses] = useState<ShapeElementT[]>([])
-  const [lines, setLines] = useState<ShapeElementT[]>([])
-  const [texts, setTexts] = useState<TextElementT[]>([])
-  const [images, setImages] = useState<ImageElementT[]>([])
-
-  const [elements, setElements] = useState<ElementT[]>([])
-  
-  const selectionManager = new SelectionManager()
-
-  const rows = useMemo(() => {
-    const rectRows = rects.map(el => {
-      return {
-        id: el.id,
-        type: el.variant + ' rect',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
-      }
-    })
-    const ellipseRows = ellipses.map(el => {
-      return {
-        id: el.id,
-        type: el.variant + ' ellipse',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
-      }
-    })
-
-    const lineRows = lines.map(el => {
-      return {
-        id: el.id,
-        type: 'lines',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
-      }
-    })
-
-    const textRows = texts.map(el => {
-      return {
-        id: el.id,
-        type: 'text',
-        x: Math.floor(el.text.getPosition().x),
-        y: Math.floor(el.text.getPosition().y),
-        color: el.text.getTextColor()
-      }
-    })
-
-    const imageRows = images.map(el => {
-      return {
-        id: el.id,
-        type: 'image',
-        x: Math.floor(el.img.getPosition().x),
-        y: Math.floor(el.img.getPosition().y),
-        color: ''
-      }
-    })
-    return rectRows.concat(ellipseRows).concat(lineRows).concat(textRows).concat(imageRows)
-  }, [rects, ellipses, lines, texts, images])
-
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 30 },
-    { field: 'type', headerType: 'TYPE', width: 120 },
-    {
-      field: 'x',
-      headerName: 'X',
-      width: 70
-    },
-    {
-      field: 'y',
-      headerName: 'Y',
-      width: 70
-    },
-    {
-      field: 'color',
-      headerName: 'COLOR',
-      width: 100
-    }
-  ]
-
-  const handleUpdateRect = (newRect: ShapeElementT) => {
-    setRects([...rects, newRect])
-  }
-
-  const handleUpdateEllipse = (newEllipse: ShapeElementT) => {
-    setEllipses([...ellipses, newEllipse])
-  }
-
-  const handleUpdateLine = (newLine: ShapeElementT) => {
-    setLines([...lines, newLine])
-  }
-
-  const handleUpdateText = (newText: TextElementT) => {
-    setTexts([...texts, newText])
-  }
-
-  const handleUpdateImage = (newImage: ImageElementT) => {
-    setImages([...images, newImage])
-  }
-
-  const handleCreateElements = (newElement: ElementT) => {
-    // setElements([...elements, newElement])
-  }
+  const handleClickElseWhere = () => {}
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', display: 'flex' }}>
       <Box sx={{ width: '70vw', height: '100vh' }}>
-        <ToolBar
-          setRects={handleUpdateRect}
-          setEllipses={handleUpdateEllipse}
-          setLines={handleUpdateLine}
-          setTexts={handleUpdateText}
-          setImages={handleUpdateImage}
-          setElements={handleCreateElements}
-          creationManager={creationManager}
-        />
+        <ToolBar createdComposite={createdComposite} />
         <Box
           sx={{
             display: 'flex',
@@ -149,26 +32,19 @@ function Editor() {
             style={{ display: 'inline-block', border: '1px solid gray', background: 'white' }}
           >
             <Layer>
-              <RectView
-                elements={elements}
-                setElements={setElements}
-                selectionManager={selectionManager}
-                creationManager={creationManager}
-              />
-              <EllipseView ellipses={ellipses} setEllipses={setEllipses} />
-              <TextView texts={texts} setTexts={setTexts} />
-              <LineView lines={lines} setLines={setLines} />
-              <ImageView images={images} setImages={setImages} />
+              <RectView createdComposite={createdComposite} />
+              <EllipseView createdComposite={createdComposite} />
+              <LineView createdComposite={createdComposite} />
             </Layer>
           </Stage>
         </Box>
       </Box>
       <Box sx={{ width: '30vw', height: '100vh' }}>
         <Box sx={{ height: '50vh' }}>
-          <PropertyWindow />
+          <PropertyWindow createdComposite={createdComposite} />
         </Box>
         <Box sx={{ height: '50vh' }}>
-          <DataGrid rows={rows} columns={columns} pagination />
+          <LayerWindow createdComposite={createdComposite} />
         </Box>
       </Box>
     </Box>
