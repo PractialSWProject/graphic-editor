@@ -71,7 +71,7 @@ class CreatedComposite {
   }
 
   updatePosition(id: number, position: Position) {
-    this.created.forEach(element => {
+    this.selected.forEach(element => {
       if (element.id === id) {
         element.properties.position = position
       }
@@ -82,7 +82,7 @@ class CreatedComposite {
   }
 
   updateSize(id: number, size: Size) {
-    this.created.forEach(element => {
+    this.selected.forEach(element => {
       if (element.id === id) {
         element.properties.size = size
       }

@@ -8,13 +8,30 @@ import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
 import LayerWindow from './LayerWindow'
 import { KonvaEventObject } from 'konva/lib/Node'
-import { DEFAULT_POS } from '../models/base'
+import { DEFAULT_POS, DEFAULT_SIZE } from '../models/base'
+import { useRef } from 'react'
+import Konva from 'konva'
 
 const createdComposite = new CreatedComposite()
 
 function Editor() {
+  const shapeRef = useRef<Konva.Ellipse | null>(null)
+  const trRef = useRef<Konva.Transformer | null>(null)
+
+  const handleTransformer = () => {
+    console.log(shapeRef.current)
+    if (shapeRef.current) {
+      if (trRef.current) {
+        trRef.current.nodes([shapeRef.current])
+        trRef.current.getLayer()?.batchDraw()
+      } else {
+        console.log('trRef is not ready')
+      }
+    }
+  }
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
     const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
+
     if (e.evt.shiftKey) {
       if (element) {
         if (createdComposite.isInSelectionManager(element)) {
@@ -25,12 +42,15 @@ function Editor() {
       }
     } else {
       if (element) {
+        shapeRef.current = e.target as Konva.Ellipse
         createdComposite.deselectAll()
         createdComposite.select(element)
       } else {
         createdComposite.deselectAll()
+        shapeRef.current = null
       }
     }
+    handleTransformer()
   }
 
   const handleMove = (e: KonvaEventObject<DragEvent>) => {
@@ -43,6 +63,23 @@ function Editor() {
       const newY = el.properties.position.y - movedY
 
       createdComposite.updatePosition(el.id, { x: newX, y: newY })
+    })
+  }
+
+  // TODO...........
+  const handleEnlarge = (e: KonvaEventObject<Event>) => {
+    const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
+
+    const scaledX = e.target.attrs.scaleX
+    const scaledY = e.target.attrs.scaleY
+
+    console.log(scaledX, scaledY)
+
+    createdComposite.getSelected().forEach(el => {
+      const newWidth = DEFAULT_SIZE.width * scaledX
+      const newHeight = DEFAULT_SIZE.height * scaledY
+
+      createdComposite.updateSize(el.id, { width: newWidth, height: newHeight })
     })
   }
 
@@ -67,7 +104,13 @@ function Editor() {
           >
             <Layer>
               <RectView createdComposite={createdComposite} handleMove={handleMove} />
-              <EllipseView createdComposite={createdComposite} handleMove={handleMove} />
+              <EllipseView
+                createdComposite={createdComposite}
+                handleMove={handleMove}
+                handleEnlarge={handleEnlarge}
+                shapeRef={shapeRef}
+                trRef={trRef}
+              />
               <LineView createdComposite={createdComposite} handleMove={handleMove} />
             </Layer>
           </Stage>
