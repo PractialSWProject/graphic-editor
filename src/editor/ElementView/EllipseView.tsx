@@ -1,46 +1,60 @@
-import { Ellipse } from 'react-konva'
-import { ShapeElementT } from '../type'
-import { Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
+import { Ellipse, Group, Transformer } from 'react-konva'
+import CreatedComposite from '../../models/composite/created'
+import { KonvaEventObject } from 'konva/lib/Node'
+import Konva from 'konva'
 
 interface Props {
-  ellipses: ShapeElementT[]
-  setEllipses: Dispatch<SetStateAction<ShapeElementT[]>>
+  createdComposite: CreatedComposite
+  handleMove: (e: KonvaEventObject<DragEvent>) => void
+  handleEnlarge: (e: KonvaEventObject<Event>) => void
+  shapeRef: React.MutableRefObject<Konva.Ellipse | null>
+  trRef: React.MutableRefObject<Konva.Transformer | null>
 }
 
-const EllipseView = ({ ellipses, setEllipses }: Props) => {
-  const updatePosition = (id: number, x: number, y: number) => {
-    const newEllipseElement = ellipses.map(el => {
-      if (el.id === id) {
-        el.shape.setPosition({ x, y })
-        return {
-          id: el.id,
-          variant: el.variant,
-          shape: el.shape
-        }
-      } else {
-        return el
-      }
-    })
-    setEllipses(newEllipseElement)
-  }
+const EllipseView = ({ createdComposite, handleMove, handleEnlarge, shapeRef, trRef }: Props) => {
+  const [updateFlag, setUpdateFlag] = useState(false)
+
+  createdComposite.listenForEllipseChanges(() => {
+    setUpdateFlag(!updateFlag)
+  })
+
+  const ellipses = createdComposite.getEllipse()
+
   return (
     <>
       {ellipses.map(el => (
-        <Ellipse
-          key={el.id}
-          x={el.shape.getPosition().x}
-          y={el.shape.getPosition().y}
-          width={el.shape.getSize().width}
-          height={el.shape.getSize().height}
-          radiusX={el.shape.getSize().width / 2}
-          radiusY={el.shape.getSize().height / 2}
-          fill={el.variant === 'filled' ? el.shape.getColor() : undefined}
-          stroke={el.variant === 'outlined' ? el.shape.getColor() : undefined}
-          onDragEnd={e => {
-            updatePosition(el.id, e.target.x(), e.target.y())
-          }}
-          draggable
-        />
+        <Group key={el.id}>
+          {el.selected && (
+            <Transformer
+              ref={trRef}
+              boundBoxFunc={(oldBox, newBox) => {
+                if (newBox.width < 5 || newBox.height < 5) {
+                  return oldBox
+                }
+                return newBox
+              }}
+            />
+          )}
+          <Ellipse
+            ref={shapeRef}
+            id={el.id.toString()}
+            x={el.properties.position.x}
+            y={el.properties.position.y}
+            width={el.properties.size.width}
+            height={el.properties.size.height}
+            radiusX={el.properties.size.width / 2}
+            radiusY={el.properties.size.height / 2}
+            fill={el.properties.color}
+            shadowBlur={10}
+            shadowColor="lime"
+            shadowEnabled={el.selected ? true : false}
+            onDragEnd={e => handleMove(e)}
+            onTransformEnd={e => handleEnlarge(e)}
+            zIndex={el.properties.zIndex}
+            draggable
+          />
+        </Group>
       ))}
     </>
   )

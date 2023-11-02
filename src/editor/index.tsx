@@ -1,125 +1,92 @@
-import { useState, useMemo } from 'react'
 import { Stage, Layer } from 'react-konva'
 import { Box } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
-import { ShapeElementT, TextElementT, ImageElementT } from './type'
 import RectView from './ElementView/RectView'
 import EllipseView from './ElementView/EllipseView'
-import TextView from './ElementView/TextView'
 import LineView from './ElementView/LineView'
-import ImageView from './ElementView/ImageView'
 import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
+import CreatedComposite from '../models/composite/created'
+import LayerWindow from './LayerWindow'
+import { KonvaEventObject } from 'konva/lib/Node'
+import { DEFAULT_POS, DEFAULT_SIZE } from '../models/base'
+import { useRef } from 'react'
+import Konva from 'konva'
+
+const createdComposite = new CreatedComposite()
 
 function Editor() {
-  const [rects, setRects] = useState<ShapeElementT[]>([])
-  const [ellipses, setEllipses] = useState<ShapeElementT[]>([])
-  const [lines, setLines] = useState<ShapeElementT[]>([])
-  const [texts, setTexts] = useState<TextElementT[]>([])
-  const [images, setImages] = useState<ImageElementT[]>([])
+  const shapeRef = useRef<Konva.Ellipse | null>(null)
+  const trRef = useRef<Konva.Transformer | null>(null)
 
-  const rows = useMemo(() => {
-    const rectRows = rects.map(el => {
-      return {
-        id: el.id,
-        type: el.variant + ' rect',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
+  const handleTransformer = () => {
+    console.log(shapeRef.current)
+    if (shapeRef.current) {
+      if (trRef.current) {
+        trRef.current.nodes([shapeRef.current])
+        trRef.current.getLayer()?.batchDraw()
+      } else {
+        console.log('trRef is not ready')
       }
-    })
-    const ellipseRows = ellipses.map(el => {
-      return {
-        id: el.id,
-        type: el.variant + ' ellipse',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
-      }
-    })
-
-    const lineRows = lines.map(el => {
-      return {
-        id: el.id,
-        type: 'lines',
-        x: Math.floor(el.shape.getPosition().x),
-        y: Math.floor(el.shape.getPosition().y),
-        color: el.shape.getColor()
-      }
-    })
-
-    const textRows = texts.map(el => {
-      return {
-        id: el.id,
-        type: 'text',
-        x: Math.floor(el.text.getPosition().x),
-        y: Math.floor(el.text.getPosition().y),
-        color: el.text.getTextColor()
-      }
-    })
-
-    const imageRows = images.map(el => {
-      return {
-        id: el.id,
-        type: 'image',
-        x: Math.floor(el.img.getPosition().x),
-        y: Math.floor(el.img.getPosition().y),
-        color: ''
-      }
-    })
-    return rectRows.concat(ellipseRows).concat(lineRows).concat(textRows).concat(imageRows)
-  }, [rects, ellipses, lines, texts, images])
-
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 30 },
-    { field: 'type', headerType: 'TYPE', width: 120 },
-    {
-      field: 'x',
-      headerName: 'X',
-      width: 70
-    },
-    {
-      field: 'y',
-      headerName: 'Y',
-      width: 70
-    },
-    {
-      field: 'color',
-      headerName: 'COLOR',
-      width: 100
     }
-  ]
+  }
+  const handleClick = (e: KonvaEventObject<MouseEvent>) => {
+    const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
 
-  const handleUpdateRect = (newRect: ShapeElementT) => {
-    setRects([...rects, newRect])
+    if (e.evt.shiftKey) {
+      if (element) {
+        if (createdComposite.isInSelectionManager(element)) {
+          createdComposite.deselect(element)
+        } else {
+          createdComposite.select(element)
+        }
+      }
+    } else {
+      if (element) {
+        shapeRef.current = e.target as Konva.Ellipse
+        createdComposite.deselectAll()
+        createdComposite.select(element)
+      } else {
+        createdComposite.deselectAll()
+        shapeRef.current = null
+      }
+    }
+    handleTransformer()
   }
 
-  const handleUpdateEllipse = (newEllipse: ShapeElementT) => {
-    setEllipses([...ellipses, newEllipse])
+  const handleMove = (e: KonvaEventObject<DragEvent>) => {
+    const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
+    const movedX = (element?.properties.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
+    const movedY = (element?.properties.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
+
+    createdComposite.getSelected().forEach(el => {
+      const newX = el.properties.position.x - movedX
+      const newY = el.properties.position.y - movedY
+
+      createdComposite.updatePosition(el.id, { x: newX, y: newY })
+    })
   }
 
-  const handleUpdateLine = (newLine: ShapeElementT) => {
-    setLines([...lines, newLine])
-  }
+  const handleEnlarge = (e: KonvaEventObject<Event>) => {
+    const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
 
-  const handleUpdateText = (newText: TextElementT) => {
-    setTexts([...texts, newText])
-  }
+    const scaledX = e.currentTarget.scaleX()
+    const scaledY = e.currentTarget.scaleX()
 
-  const handleUpdateImage = (newImage: ImageElementT) => {
-    setImages([...images, newImage])
+    createdComposite.getSelected().forEach(el => {
+      const newWidth = el.properties.size.width * scaledX
+      const newHeight = el.properties.size.height * scaledY
+
+      createdComposite.updateSize(el.id, { width: newWidth, height: newHeight })
+    })
+
+    e.currentTarget.scaleX(1)
+    e.currentTarget.scaleY(1)
   }
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', display: 'flex' }}>
       <Box sx={{ width: '70vw', height: '100vh' }}>
-        <ToolBar
-          setRects={handleUpdateRect}
-          setEllipses={handleUpdateEllipse}
-          setLines={handleUpdateLine}
-          setTexts={handleUpdateText}
-          setImages={handleUpdateImage}
-        />
+        <ToolBar createdComposite={createdComposite} />
         <Box
           sx={{
             display: 'flex',
@@ -133,23 +100,28 @@ function Editor() {
             width={500}
             height={500}
             style={{ display: 'inline-block', border: '1px solid gray', background: 'white' }}
+            onClick={e => handleClick(e)}
           >
             <Layer>
-              <RectView rects={rects} setRects={setRects} />
-              <EllipseView ellipses={ellipses} setEllipses={setEllipses} />
-              <TextView texts={texts} setTexts={setTexts} />
-              <LineView lines={lines} setLines={setLines} />
-              <ImageView images={images} setImages={setImages} />
+              <RectView createdComposite={createdComposite} handleMove={handleMove} />
+              <EllipseView
+                createdComposite={createdComposite}
+                handleMove={handleMove}
+                handleEnlarge={handleEnlarge}
+                shapeRef={shapeRef}
+                trRef={trRef}
+              />
+              <LineView createdComposite={createdComposite} handleMove={handleMove} />
             </Layer>
           </Stage>
         </Box>
       </Box>
       <Box sx={{ width: '30vw', height: '100vh' }}>
-        <Box sx={{ height: '50vh' }}>
-          <PropertyWindow />
+        <Box sx={{ height: '50vh', backgroundColor: '#434343' }}>
+          <PropertyWindow createdComposite={createdComposite} />
         </Box>
         <Box sx={{ height: '50vh' }}>
-          <DataGrid rows={rows} columns={columns} pagination />
+          <LayerWindow createdComposite={createdComposite} />
         </Box>
       </Box>
     </Box>
