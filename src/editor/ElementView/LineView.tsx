@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { Group, Line } from 'react-konva'
+import { Group } from 'react-konva'
 import CreatedComposite from '../../models/composite/created'
 import { KonvaEventObject } from 'konva/lib/Node'
+import { Line } from 'react-konva'
 
 interface Props {
   createdComposite: CreatedComposite
-  handleMove: (e: KonvaEventObject<DragEvent>) => void
+  handleMove: (e: KonvaEventObject<DragEvent>, isLine?: boolean) => void
+  handleEnlarge: (e: KonvaEventObject<Event>) => void
 }
 
-const LineView = ({ createdComposite, handleMove }: Props) => {
+const LineView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
   const [updateLineFlag, setUpdateLineFlag] = useState(false)
 
   createdComposite.listenForLineChanges(() => {
@@ -16,6 +18,7 @@ const LineView = ({ createdComposite, handleMove }: Props) => {
   })
 
   const lines = createdComposite.getLines()
+  console.log('lines', lines)
 
   return (
     <>
@@ -23,8 +26,8 @@ const LineView = ({ createdComposite, handleMove }: Props) => {
         <Group key={el.id}>
           <Line
             id={el.id.toString()}
-            x={el.properties.position.x}
-            y={el.properties.position.y}
+            x={0}
+            y={0}
             points={[
               el.properties.position.x,
               el.properties.position.y,
@@ -36,7 +39,8 @@ const LineView = ({ createdComposite, handleMove }: Props) => {
             shadowEnabled={el.selected ? true : false}
             stroke={el.properties.color}
             strokeWidth={5}
-            onDragEnd={e => handleMove(e)}
+            onDragEnd={e => handleMove(e, true)}
+            onTransformEnd={e => handleEnlarge(e)}
             zIndex={el.properties.zIndex}
             draggable
           />
