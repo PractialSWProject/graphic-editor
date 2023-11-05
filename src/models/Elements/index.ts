@@ -10,6 +10,7 @@ export interface ElementProps {
 abstract class Elements {
   public id: number
   public selected: boolean = false
+  public deleted: boolean = false
   public properties: ElementProps = {
     size: DEFAULT_SIZE,
     position: DEFAULT_POS,

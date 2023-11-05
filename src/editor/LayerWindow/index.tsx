@@ -3,10 +3,10 @@ import CreatedComposite from '../../models/composite/created'
 import { useState } from 'react'
 import LayerInfo from './LayerInfo'
 import Elements from '../../models/Elements'
-import { Box, Button, ButtonGroup, Typography } from '@mui/material'
+import { Box, Button, ButtonGroup } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-
+// import { DeleteOutline } from '@mui/icons-material'
 interface Props {
   createdComposite: CreatedComposite
 }
@@ -20,14 +20,17 @@ const LayerWindow = ({ createdComposite }: Props) => {
     setUpdateLayers(!updateLayers)
   })
 
-  let rows = createdElements.map((el, index) => ({
-    id: el.id,
-    shape: el,
-    rowId: index,
-    name: el,
-    zIndex: el.properties.zIndex,
-    zIndexChange: el
-  }))
+  let rows = createdElements
+    .filter(el => !el.deleted)
+    .map((el, index) => ({
+      id: el.id,
+      shape: el,
+      rowId: index,
+      name: el,
+      zIndex: el.properties.zIndex,
+      zIndexChange: el,
+      delete: el.id
+    }))
 
   rows = rows.sort((a, b) => b.zIndex - a.zIndex)
   const maxZIndex = rows.length
@@ -53,6 +56,11 @@ const LayerWindow = ({ createdComposite }: Props) => {
     handleZIndexChange(element, 'down')
   }
 
+  // const handleDeleteLayer = (id: number) => {
+  //   console.log(id)
+  //   createdComposite.destroy(id)
+  // }
+
   const columns: GridColDef[] = [
     {
       field: 'shape',
@@ -69,15 +77,8 @@ const LayerWindow = ({ createdComposite }: Props) => {
       )
     },
     {
-      field: 'zIndex',
-      width: 50,
-      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
-        <Typography>{params.value}</Typography>
-      )
-    },
-    {
       field: 'zIndexChange',
-      width: 200,
+      width: 100,
       renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
         <Box>
           <ButtonGroup variant="text" aria-label="text button group" size="small" sx={{ color: 'white' }}>
@@ -102,6 +103,20 @@ const LayerWindow = ({ createdComposite }: Props) => {
         </Box>
       )
     }
+    // TODO : next phase
+    // {
+    //   field: 'delete',
+    //   width: 100,
+    //   renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+    //     <Button
+    //       onClick={() => {
+    //         handleDeleteLayer(params.value)
+    //       }}
+    //     >
+    //       <DeleteOutline color="secondary" />
+    //     </Button>
+    //   )
+    // }
   ]
 
   return <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />

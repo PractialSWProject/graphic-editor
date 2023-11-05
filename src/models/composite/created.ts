@@ -11,6 +11,7 @@ class CreatedComposite {
   private selected: Elements[] = []
 
   // listeners
+  private shapeChangeListener: ChangeListener | null = null
   private rectChangeListener: ChangeListener | null = null
   private lineChangeListener: ChangeListener | null = null
   private ellipseChangeListener: ChangeListener | null = null
@@ -19,11 +20,18 @@ class CreatedComposite {
 
   create(element: Elements) {
     this.created.push(element)
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
   }
 
-  destroy(element: Elements) {
-    this.created = this.created.filter(el => el.id !== element.id)
+  destroy(id: number) {
+    this.created.forEach(element => {
+      if (element.id === id) {
+        element.deleted = true
+      }
+    })
+    this.selected = this.selected.filter(el => el.id !== id)
+    this.notifyShapeChanges()
+    this.notifyLayerChanges()
   }
 
   clear() {
@@ -37,14 +45,14 @@ class CreatedComposite {
   select(element: Elements) {
     this.selected.push(element)
     element.selected = true
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
   deselect(element: Elements) {
     this.selected = this.selected.filter(el => el.id !== element.id)
     element.selected = false
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -54,9 +62,7 @@ class CreatedComposite {
     })
     this.selected = []
 
-    this.notifyEllipseChanges()
-    this.notifyLineChanges()
-    this.notifyRectChanges()
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -77,7 +83,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -88,7 +94,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
   updateColor(id: number, color: string) {
@@ -98,7 +104,7 @@ class CreatedComposite {
       }
     })
     this.notifyPropertyWindowChanges()
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
   }
 
   updateZIndex(id: number, zIndex: number) {
@@ -108,7 +114,7 @@ class CreatedComposite {
       }
     })
     this.notifyLayerChanges()
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
   }
 
   getRectangles(): Array<Rectangle> {
@@ -121,6 +127,14 @@ class CreatedComposite {
 
   getEllipse(): Array<Ellipse> {
     return this.created.filter(el => el instanceof Ellipse) as Array<Ellipse>
+  }
+
+  listenForShapeChanges(listener: ChangeListener) {
+    if (this.shapeChangeListener) {
+      this.shapeChangeListener = null
+    }
+
+    this.shapeChangeListener = listener
   }
 
   listenForRectChanges(listener: ChangeListener) {
@@ -173,33 +187,11 @@ class CreatedComposite {
     }
   }
 
-  private notifyRectChanges() {
-    if (this.rectChangeListener) {
-      this.rectChangeListener()
-    }
-  }
-
-  private notifyLineChanges() {
-    if (this.lineChangeListener) {
-      this.lineChangeListener()
-    }
-  }
-
-  private notifyEllipseChanges() {
-    if (this.ellipseChangeListener) {
-      this.ellipseChangeListener()
-    }
-  }
-
-  notifyBasedOnType(element: Elements) {
+  private notifyShapeChanges() {
     this.notifyLayerChanges()
 
-    if (element instanceof Rectangle) {
-      this.notifyRectChanges()
-    } else if (element instanceof Line) {
-      this.notifyLineChanges()
-    } else if (element instanceof Ellipse) {
-      this.notifyEllipseChanges()
+    if (this.shapeChangeListener) {
+      this.shapeChangeListener()
     }
   }
 }
