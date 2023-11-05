@@ -12,9 +12,6 @@ class CreatedComposite {
 
   // listeners
   private shapeChangeListener: ChangeListener | null = null
-  private rectChangeListener: ChangeListener | null = null
-  private lineChangeListener: ChangeListener | null = null
-  private ellipseChangeListener: ChangeListener | null = null
   private layerChangeListener: ChangeListener | null = null
   private propertyWindowListener: ChangeListener | null = null
 
@@ -135,30 +132,6 @@ class CreatedComposite {
     }
 
     this.shapeChangeListener = listener
-  }
-
-  listenForRectChanges(listener: ChangeListener) {
-    if (this.rectChangeListener) {
-      this.rectChangeListener = null
-    }
-
-    this.rectChangeListener = listener
-  }
-
-  listenForEllipseChanges(listener: ChangeListener) {
-    if (this.ellipseChangeListener) {
-      this.ellipseChangeListener = null
-    }
-
-    this.ellipseChangeListener = listener
-  }
-
-  listenForLineChanges(listener: ChangeListener) {
-    if (this.lineChangeListener) {
-      this.lineChangeListener = null
-    }
-
-    this.lineChangeListener = listener
   }
 
   listenForLayerChanges(listener: ChangeListener) {
