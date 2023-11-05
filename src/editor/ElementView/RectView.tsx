@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { Group, Rect } from 'react-konva'
+import { Group } from 'react-konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import CreatedComposite from '../../models/composite/created'
+import { Rect } from 'react-konva'
 
 interface Props {
   createdComposite: CreatedComposite
   handleMove: (e: KonvaEventObject<DragEvent>) => void
+  handleEnlarge: (e: KonvaEventObject<Event>) => void
 }
 
-const RectView = ({ createdComposite, handleMove }: Props) => {
+const RectView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
   const [updateRectFlag, setUpdateRectFlag] = useState(false)
 
   createdComposite.listenForRectChanges(() => {
@@ -32,6 +34,7 @@ const RectView = ({ createdComposite, handleMove }: Props) => {
             shadowColor="lime"
             shadowEnabled={el.selected ? true : false}
             onDragEnd={e => handleMove(e)}
+            onTransformEnd={e => handleEnlarge(e)}
             zIndex={el.properties.zIndex}
             draggable
           />

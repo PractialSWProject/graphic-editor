@@ -7,28 +7,36 @@ import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
 import LayerWindow from './LayerWindow'
-import { KonvaEventObject } from 'konva/lib/Node'
-import { DEFAULT_POS, DEFAULT_SIZE } from '../models/base'
+import { KonvaEventObject, Node, NodeConfig } from 'konva/lib/Node'
+import { DEFAULT_POS } from '../models/base'
 import { useRef } from 'react'
 import Konva from 'konva'
+import { Transformer } from 'react-konva'
+
+export type KonvaComponentT = Konva.Ellipse | Konva.Rect | Konva.Line | null
 
 const createdComposite = new CreatedComposite()
 
 function Editor() {
-  const shapeRef = useRef<Konva.Ellipse | null>(null)
+  const layerRef = useRef<Konva.Layer | null>(null)
   const trRef = useRef<Konva.Transformer | null>(null)
 
   const handleTransformer = () => {
-    console.log(shapeRef.current)
-    if (shapeRef.current) {
-      if (trRef.current) {
-        trRef.current.nodes([shapeRef.current])
+    const layerRefCurrent = layerRef.current
+
+    if (createdComposite.getSelected()) {
+      if (trRef.current && layerRefCurrent) {
+        const selectedIds = createdComposite.getSelected().map(el => el.id)
+        const selectedNodes = selectedIds.map(id => layerRefCurrent.findOne('#' + id)) as Node<NodeConfig>[]
+
+        trRef.current.nodes(selectedNodes)
         trRef.current.getLayer()?.batchDraw()
       } else {
         console.log('trRef is not ready')
       }
     }
   }
+
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
     const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
 
@@ -42,42 +50,55 @@ function Editor() {
       }
     } else {
       if (element) {
-        shapeRef.current = e.target as Konva.Ellipse
         createdComposite.deselectAll()
         createdComposite.select(element)
       } else {
         createdComposite.deselectAll()
-        shapeRef.current = null
       }
     }
     handleTransformer()
   }
 
-  const handleMove = (e: KonvaEventObject<DragEvent>) => {
+  const handleMove = (e: KonvaEventObject<DragEvent>, isLine?: boolean) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
     const movedX = (element?.properties.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
     const movedY = (element?.properties.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
 
-    createdComposite.getSelected().forEach(el => {
-      const newX = el.properties.position.x - movedX
-      const newY = el.properties.position.y - movedY
+    if (!element) return
+    const newX = isLine
+      ? e.currentTarget.attrs.x + e.currentTarget.attrs.points[0]
+      : element.properties.position.x - movedX
+    const newY = isLine
+      ? e.currentTarget.attrs.y + e.currentTarget.attrs.points[1]
+      : element.properties.position.y - movedY
 
-      createdComposite.updatePosition(el.id, { x: newX, y: newY })
+    if (isLine) {
+      e.currentTarget.x(0)
+      e.currentTarget.y(0)
+    }
+
+    createdComposite.updatePosition(element.id, {
+      x: newX,
+      y: newY
     })
   }
 
-  const handleEnlarge = (e: KonvaEventObject<Event>) => {
+  const handleEnlarge = (e: KonvaEventObject<Event>, isLine?: boolean) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
+    if (!element) return
+
+    if (isLine) {
+      e.currentTarget.x(0)
+      e.currentTarget.y(0)
+    }
 
     const scaledX = e.currentTarget.scaleX()
-    const scaledY = e.currentTarget.scaleX()
+    const scaledY = e.currentTarget.scaleY()
 
-    createdComposite.getSelected().forEach(el => {
-      const newWidth = el.properties.size.width * scaledX
-      const newHeight = el.properties.size.height * scaledY
+    const newWidth = element.properties.size.width * scaledX
+    const newHeight = element.properties.size.height * scaledY
 
-      createdComposite.updateSize(el.id, { width: newWidth, height: newHeight })
-    })
+    createdComposite.updateSize(element.id, { width: newWidth, height: newHeight })
 
     e.currentTarget.scaleX(1)
     e.currentTarget.scaleY(1)
@@ -102,16 +123,19 @@ function Editor() {
             style={{ display: 'inline-block', border: '1px solid gray', background: 'white' }}
             onClick={e => handleClick(e)}
           >
-            <Layer>
-              <RectView createdComposite={createdComposite} handleMove={handleMove} />
-              <EllipseView
-                createdComposite={createdComposite}
-                handleMove={handleMove}
-                handleEnlarge={handleEnlarge}
-                shapeRef={shapeRef}
-                trRef={trRef}
+            <Layer ref={layerRef}>
+              <RectView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              <EllipseView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              <LineView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              <Transformer
+                ref={trRef}
+                boundBoxFunc={(oldBox, newBox) => {
+                  if (newBox.width < 5 || newBox.height < 5) {
+                    return oldBox
+                  }
+                  return newBox
+                }}
               />
-              <LineView createdComposite={createdComposite} handleMove={handleMove} />
             </Layer>
           </Stage>
         </Box>
