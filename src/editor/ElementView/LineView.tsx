@@ -7,7 +7,7 @@ import { Line } from 'react-konva'
 interface Props {
   createdComposite: CreatedComposite
   handleMove: (e: KonvaEventObject<DragEvent>, isLine?: boolean) => void
-  handleEnlarge: (e: KonvaEventObject<Event>) => void
+  handleEnlarge: (e: KonvaEventObject<Event>, isLine?: boolean) => void
 }
 
 const LineView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
@@ -40,7 +40,7 @@ const LineView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
             stroke={el.properties.color}
             strokeWidth={5}
             onDragEnd={e => handleMove(e, true)}
-            onTransformEnd={e => handleEnlarge(e)}
+            onTransformEnd={e => handleEnlarge(e, true)}
             zIndex={el.properties.zIndex}
             draggable
           />

@@ -61,24 +61,36 @@ function Editor() {
 
   const handleMove = (e: KonvaEventObject<DragEvent>, isLine?: boolean) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
-    const movedX =
-      (element?.properties.position.x || DEFAULT_POS.x) -
-      (isLine && isLine === true ? e.target.getAttr('points')[0] : e.target.getAttr('x'))
-    const movedY =
-      (element?.properties.position.y || DEFAULT_POS.y) -
-      (isLine && isLine === true ? e.target.getAttr('points')[1] : e.target.getAttr('y'))
+    const movedX = (element?.properties.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
+    const movedY = (element?.properties.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
 
-    console.log(element && element.id)
     if (!element) return
-    const newX = element.properties.position.x - movedX
-    const newY = element.properties.position.y - movedY
-    createdComposite.updatePosition(element.id, { x: newX, y: newY })
+    const newX = isLine
+      ? e.currentTarget.attrs.x + e.currentTarget.attrs.points[0]
+      : element.properties.position.x - movedX
+    const newY = isLine
+      ? e.currentTarget.attrs.y + e.currentTarget.attrs.points[1]
+      : element.properties.position.y - movedY
+
+    if (isLine) {
+      e.currentTarget.x(0)
+      e.currentTarget.y(0)
+    }
+
+    createdComposite.updatePosition(element.id, {
+      x: newX,
+      y: newY
+    })
   }
 
-  const handleEnlarge = (e: KonvaEventObject<Event>) => {
+  const handleEnlarge = (e: KonvaEventObject<Event>, isLine?: boolean) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
-
     if (!element) return
+
+    if (isLine) {
+      e.currentTarget.x(0)
+      e.currentTarget.y(0)
+    }
 
     const scaledX = e.currentTarget.scaleX()
     const scaledY = e.currentTarget.scaleY()
