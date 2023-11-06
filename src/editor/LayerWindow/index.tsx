@@ -6,13 +6,17 @@ import Elements from '../../models/Elements'
 import { Box, Button, ButtonGroup } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import Konva from 'konva'
 // import { DeleteOutline } from '@mui/icons-material'
 interface Props {
   createdComposite: CreatedComposite
+  layerRef: React.MutableRefObject<any>
+  shapeListener: () => void
 }
 
-const LayerWindow = ({ createdComposite }: Props) => {
+const LayerWindow = ({ createdComposite, layerRef, shapeListener }: Props) => {
   const createdElements = createdComposite.get()
+  const layerRefCurrent = layerRef.current
 
   const [updateLayers, setUpdateLayers] = useState(false)
 
@@ -41,6 +45,26 @@ const LayerWindow = ({ createdComposite }: Props) => {
     const newZIndex = currentZIdex + zIndexChange
 
     const elementWithNewZIndex = createdElements.find(el => el.properties.zIndex === newZIndex)
+
+    if (layerRefCurrent) {
+      const node = layerRefCurrent.findOne('#' + element.id)
+      const nodeWithNewZIndex = layerRefCurrent.findOne('#' + elementWithNewZIndex?.id)
+      // node.zIndex(newZIndex)
+      // nodeWithNewZIndex.zIndex(currentZIdex)
+      console.log('before cur:', node.zIndex(), 'before other:', nodeWithNewZIndex.zIndex())
+      if (direction === 'up') {
+        node.moveUp()
+        nodeWithNewZIndex.moveDown()
+      } else {
+        node.moveDown()
+        nodeWithNewZIndex.moveUp()
+      }
+      console.log('NEW cur:', node.zIndex(), 'new other:', nodeWithNewZIndex.zIndex())
+      layerRefCurrent.getChildren().sort((a: Konva.Shape, b: Konva.Shape) => b.zIndex() - a.zIndex())
+      layerRefCurrent.draw()
+
+      shapeListener()
+    }
 
     if (elementWithNewZIndex) {
       createdComposite.updateZIndex(element.id, newZIndex)
