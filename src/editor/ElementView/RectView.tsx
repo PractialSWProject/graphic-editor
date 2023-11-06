@@ -26,7 +26,6 @@ const RectView = ({ el, handleMove, handleEnlarge }: Props) => {
         shadowEnabled={el.selected ? true : false}
         onDragEnd={e => handleMove(e)}
         onTransformEnd={e => handleEnlarge(e)}
-        zIndex={el.properties.zIndex}
         draggable
       />
     </Group>
