@@ -160,7 +160,15 @@ function Editor() {
           <PropertyWindow createdComposite={createdComposite} />
         </Box>
         <Box sx={{ height: '50vh' }}>
-          <LayerWindow createdComposite={createdComposite} />
+          <LayerWindow
+            createdComposite={createdComposite}
+            layerRef={layerRef}
+            shapeListener={() => {
+              createdComposite.listenForShapeChanges(() => {
+                setUpdateShapes(!updateShapes)
+              })
+            }}
+          />
         </Box>
       </Box>
     </Box>
