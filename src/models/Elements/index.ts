@@ -1,4 +1,5 @@
-import { DEFAULT_COLOR, DEFAULT_POS, DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
+import getRandomColor from '../../utils/randomColor'
+import { DEFAULT_POS, DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
 
 export interface ElementProps {
   size: Size
@@ -15,7 +16,7 @@ abstract class Elements {
     size: DEFAULT_SIZE,
     position: DEFAULT_POS,
     zIndex: 0,
-    color: DEFAULT_COLOR
+    color: getRandomColor()
   }
 
   constructor(id: number) {
