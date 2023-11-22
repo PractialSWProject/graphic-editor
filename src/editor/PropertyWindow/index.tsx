@@ -2,13 +2,14 @@ import { Box, Dialog, Divider, Grid, TextField, Typography } from '@mui/material
 import { useState } from 'react'
 import { SketchPicker } from 'react-color'
 import CreatedComposite from '../../models/composite/created'
+import Text from '../../models/Elements/Text'
+import { Shapes } from '../../models/Elements'
 
 interface Props {
   createdComposite: CreatedComposite
 }
 
 function PropertyWindow({ createdComposite }: Props) {
-  
   const [isOpenPalette, setIsOpenPalette] = useState(false)
   const [updateProperty, setUpdateProperty] = useState(false)
 
@@ -30,7 +31,7 @@ function PropertyWindow({ createdComposite }: Props) {
   const handleChangePosition = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, xy: string) => {
     const newXY = parseFloat(e.target.value)
     if (!isNaN(newXY)) {
-      const currentPosition = selected[0].properties.position
+      const currentPosition = selected[0].position
       const newPosition = xy === 'x' ? { ...currentPosition, x: newXY } : { ...currentPosition, y: newXY }
       createdComposite.updatePosition(selected[0].id, newPosition)
     }
@@ -39,7 +40,7 @@ function PropertyWindow({ createdComposite }: Props) {
   const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, wh: string) => {
     const newWH = parseFloat(e.target.value)
     if (!isNaN(newWH)) {
-      const currentPosition = selected[0].properties.size
+      const currentPosition = selected[0].size
       const newSize = wh === 'height' ? { ...currentPosition, height: newWH } : { ...currentPosition, width: newWH }
       createdComposite.updateSize(selected[0].id, newSize)
     }
@@ -63,7 +64,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangePosition(e, 'x')}
-                value={selected.length === 1 && Math.floor(selected[0].properties.position.x)}
+                value={selected.length === 1 && Math.floor(selected[0].position.x)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -80,7 +81,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangePosition(e, 'y')}
-                value={selected.length === 1 && Math.floor(selected[0].properties.position.y)}
+                value={selected.length === 1 && Math.floor(selected[0].position.y)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -94,12 +95,12 @@ function PropertyWindow({ createdComposite }: Props) {
               </Typography>
               <TextField
                 size="small"
-                disabled={selected.length !== 1}
+                disabled={selected.length !== 1 || selected[0] instanceof Text}
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangeSize(e, 'width')}
-                value={selected.length === 1 && Math.floor(selected[0].properties.size.width)}
+                value={selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].size.width)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -111,18 +112,18 @@ function PropertyWindow({ createdComposite }: Props) {
               </Typography>
               <TextField
                 size="small"
-                disabled={selected.length !== 1}
+                disabled={selected.length !== 1 || selected[0] instanceof Text}
                 margin="dense"
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangeSize(e, 'height')}
-                value={selected.length === 1 && Math.floor(selected[0].properties.size.height)}
+                value={selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].size.height)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
         </Grid>
-        {selected.length !== 0 && (
+        {selected.length !== 0 && (selected[0] instanceof Shapes || selected[0] instanceof Text) && (
           <Box padding={2}>
             <Divider sx={{ borderColor: '#333', mb: 2 }} />
             <Typography variant="body2" color={'#C7C7C7'}>
@@ -133,7 +134,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 sx={{
                   width: 20,
                   height: 20,
-                  backgroundColor: selected.length === 1 ? selected[0].properties.color : '#FFF',
+                  backgroundColor: selected.length === 1 ? selected[0].color : '#FFF',
                   borderRadius: 2,
                   mr: 2,
                   border: '0.5px solid white'
@@ -141,18 +142,17 @@ function PropertyWindow({ createdComposite }: Props) {
                 onClick={handleOpenPalette}
               />
               <Typography variant="body1" marginRight={2} color={'#C7C7C7'}>
-                {selected.length === 0 ? '' : selected.length === 1 ? selected[0].properties.color : 'Mixed'}
+                {selected.length === 0 ? '' : selected.length === 1 ? selected[0].color : 'Mixed'}
               </Typography>
             </Box>
           </Box>
         )}
       </Box>
-      <Dialog open={isOpenPalette} onClose={() => setIsOpenPalette(false)}>
-        <SketchPicker
-          color={selected.length ? selected[0].properties.color : '#FFF'}
-          onChangeComplete={handleChangeColor}
-        />
-      </Dialog>
+      {(selected[0] instanceof Shapes || selected[0] instanceof Text) && (
+        <Dialog open={isOpenPalette} onClose={() => setIsOpenPalette(false)}>
+          <SketchPicker color={selected.length ? selected[0].color : '#FFF'} onChangeComplete={handleChangeColor} />
+        </Dialog>
+      )}
     </Box>
   )
 }

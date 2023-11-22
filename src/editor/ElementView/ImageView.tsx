@@ -2,37 +2,38 @@ import { useState } from 'react'
 import { Group } from 'react-konva'
 import CreatedComposite from '../../models/composite/created'
 import { KonvaEventObject } from 'konva/lib/Node'
-import { Ellipse } from 'react-konva'
+import { Image } from 'react-konva'
 
 interface Props {
   createdComposite: CreatedComposite
-  handleMove: (e: KonvaEventObject<DragEvent>) => void
-  handleEnlarge: (e: KonvaEventObject<Event>) => void
+  handleMove: (e: KonvaEventObject<DragEvent>, isLine?: boolean) => void
+  handleEnlarge: (e: KonvaEventObject<Event>, isLine?: boolean) => void
 }
 
-const EllipseView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
-  const [updateFlag, setUpdateFlag] = useState(false)
+const ImageView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
+  const [updateLineFlag, setUpdateLineFlag] = useState(false)
 
-  createdComposite.listenForEllipseChanges(() => {
-    setUpdateFlag(!updateFlag)
+  createdComposite.listenForImageChanges(() => {
+    setUpdateLineFlag(!updateLineFlag)
   })
 
-  const ellipses = createdComposite.getEllipse()
+  const images = createdComposite.getImage()
 
   return (
     <>
-      {ellipses.map(el => {
+      {images.map(el => {
+        const image = new window.Image()
+        image.src = el.url
+
         return (
           <Group key={el.id}>
-            <Ellipse
+            <Image
               id={el.id.toString()}
               x={el.position.x}
               y={el.position.y}
               width={el.size.width}
               height={el.size.height}
-              radiusX={el.size.width / 2}
-              radiusY={el.size.height / 2}
-              fill={el.color}
+              image={image}
               shadowBlur={10}
               shadowColor="lime"
               shadowEnabled={el.selected ? true : false}
@@ -48,4 +49,4 @@ const EllipseView = ({ createdComposite, handleMove, handleEnlarge }: Props) => 
   )
 }
 
-export default EllipseView
+export default ImageView

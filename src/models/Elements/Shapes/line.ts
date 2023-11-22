@@ -1,13 +1,6 @@
-import Elements, { ElementProps } from '..'
+import { Shapes } from '..'
 
-class Line extends Elements {
-  create() {
-    console.log('Drawing a line:', this.properties)
-  }
-
-  setProps(properties: ElementProps) {
-    this.properties = properties
-  }
+class Line extends Shapes {
   setSelect(selected: boolean): void {
     this.selected = selected
   }

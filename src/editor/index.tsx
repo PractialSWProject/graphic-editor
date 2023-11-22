@@ -3,6 +3,8 @@ import { Box } from '@mui/material'
 import RectView from './ElementView/RectView'
 import EllipseView from './ElementView/EllipseView'
 import LineView from './ElementView/LineView'
+import TextView from './ElementView/TextView'
+import ImageView from './ElementView/ImageView'
 import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
@@ -12,6 +14,7 @@ import { DEFAULT_POS } from '../models/base'
 import { useRef } from 'react'
 import Konva from 'konva'
 import { Transformer } from 'react-konva'
+import Text from '../models/Elements/Text'
 
 export type KonvaComponentT = Konva.Ellipse | Konva.Rect | Konva.Line | null
 
@@ -61,16 +64,12 @@ function Editor() {
 
   const handleMove = (e: KonvaEventObject<DragEvent>, isLine?: boolean) => {
     const element = createdComposite.getSelected().find(el => el.id === parseInt(e.target.attrs.id))
-    const movedX = (element?.properties.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
-    const movedY = (element?.properties.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
+    const movedX = (element?.position.x || DEFAULT_POS.x) - e.target.getAttr('x')
+    const movedY = (element?.position.y || DEFAULT_POS.y) - e.target.getAttr('y')
 
     if (!element) return
-    const newX = isLine
-      ? e.currentTarget.attrs.x + e.currentTarget.attrs.points[0]
-      : element.properties.position.x - movedX
-    const newY = isLine
-      ? e.currentTarget.attrs.y + e.currentTarget.attrs.points[1]
-      : element.properties.position.y - movedY
+    const newX = isLine ? e.currentTarget.attrs.x + e.currentTarget.attrs.points[0] : element.position.x - movedX
+    const newY = isLine ? e.currentTarget.attrs.y + e.currentTarget.attrs.points[1] : element.position.y - movedY
 
     if (isLine) {
       e.currentTarget.x(0)
@@ -88,17 +87,26 @@ function Editor() {
     if (!element) return
 
     if (isLine) {
+      //line일 때
       e.currentTarget.x(0)
       e.currentTarget.y(0)
     }
 
-    const scaledX = e.currentTarget.scaleX()
-    const scaledY = e.currentTarget.scaleY()
+    if (isLine === false && element instanceof Text) {
+      //text일 때
+      const scale = e.currentTarget.scaleX()
+      const newFontSize = element.fontSize * scale
 
-    const newWidth = element.properties.size.width * scaledX
-    const newHeight = element.properties.size.height * scaledY
+      createdComposite.updateFontSize(element.id, newFontSize)
+    } else {
+      const scaledX = e.currentTarget.scaleX()
+      const scaledY = e.currentTarget.scaleY()
 
-    createdComposite.updateSize(element.id, { width: newWidth, height: newHeight })
+      const newWidth = element.size.width * scaledX
+      const newHeight = element.size.height * scaledY
+
+      createdComposite.updateSize(element.id, { width: newWidth, height: newHeight })
+    }
 
     e.currentTarget.scaleX(1)
     e.currentTarget.scaleY(1)
@@ -127,6 +135,8 @@ function Editor() {
               <RectView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
               <EllipseView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
               <LineView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              <TextView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              <ImageView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
               <Transformer
                 ref={trRef}
                 boundBoxFunc={(oldBox, newBox) => {

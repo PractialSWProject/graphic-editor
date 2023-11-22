@@ -1,14 +1,6 @@
-import Elements, { ElementProps } from '..'
+import { Shapes } from '..'
 
-class Ellipse extends Elements {
-  create() {
-    console.log('Drawing an Ellipse:', this.properties)
-  }
-
-  setProps(properties: ElementProps) {
-    this.properties = properties
-  }
-
+class Ellipse extends Shapes {
   setSelect(selected: boolean): void {
     this.selected = selected
   }

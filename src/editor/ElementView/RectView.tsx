@@ -25,17 +25,17 @@ const RectView = ({ createdComposite, handleMove, handleEnlarge }: Props) => {
         <Group key={el.id}>
           <Rect
             id={el.id.toString()}
-            x={el.properties.position.x}
-            y={el.properties.position.y}
-            width={el.properties.size.width}
-            height={el.properties.size.height}
-            fill={el.properties.color}
+            x={el.position.x}
+            y={el.position.y}
+            width={el.size.width}
+            height={el.size.height}
+            fill={el.color}
             shadowBlur={10}
             shadowColor="lime"
             shadowEnabled={el.selected ? true : false}
             onDragEnd={e => handleMove(e)}
             onTransformEnd={e => handleEnlarge(e)}
-            zIndex={el.properties.zIndex}
+            zIndex={el.zIndex}
             draggable
           />
         </Group>

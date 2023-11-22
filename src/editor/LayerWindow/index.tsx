@@ -25,7 +25,7 @@ const LayerWindow = ({ createdComposite }: Props) => {
     shape: el,
     rowId: index,
     name: el,
-    zIndex: el.properties.zIndex,
+    zIndex: el.zIndex,
     zIndexChange: el
   }))
 
@@ -34,10 +34,10 @@ const LayerWindow = ({ createdComposite }: Props) => {
 
   const handleZIndexChange = (element: Elements, direction: 'up' | 'down') => {
     const zIndexChange = direction === 'up' ? 1 : -1
-    const currentZIdex = element.properties.zIndex
+    const currentZIdex = element.zIndex
     const newZIndex = currentZIdex + zIndexChange
 
-    const elementWithNewZIndex = createdElements.find(el => el.properties.zIndex === newZIndex)
+    const elementWithNewZIndex = createdElements.find(el => el.zIndex === newZIndex)
 
     if (elementWithNewZIndex) {
       createdComposite.updateZIndex(element.id, newZIndex)
@@ -82,9 +82,9 @@ const LayerWindow = ({ createdComposite }: Props) => {
         <Box>
           <ButtonGroup variant="text" aria-label="text button group" size="small" sx={{ color: 'white' }}>
             <Button
-              disabled={params.value.properties.zIndex === maxZIndex}
+              disabled={params.value.zIndex === maxZIndex}
               sx={{
-                backgroundColor: params.value.properties.zIndex === maxZIndex ? 'white' : '#434343',
+                backgroundColor: params.value.zIndex === maxZIndex ? 'white' : '#434343',
                 color: '#C7C7C7'
               }}
               onClick={() => handleZIndexUp(params.value)}
@@ -92,8 +92,8 @@ const LayerWindow = ({ createdComposite }: Props) => {
               <KeyboardArrowUpIcon />
             </Button>
             <Button
-              disabled={params.value.properties.zIndex === 1}
-              sx={{ backgroundColor: params.value.properties.zIndex === 1 ? 'white' : '#434343', color: '#C7C7C7' }}
+              disabled={params.value.zIndex === 1}
+              sx={{ backgroundColor: params.value.zIndex === 1 ? 'white' : '#434343', color: '#C7C7C7' }}
               onClick={() => handleZIndexDown(params.value)}
             >
               <KeyboardArrowDownIcon />
