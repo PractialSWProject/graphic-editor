@@ -8,17 +8,19 @@ import ImageView from './ElementView/ImageView'
 import ToolBar from './ToolBar'
 import PropertyWindow from './PropertyWindow'
 import CreatedComposite from '../models/composite/created'
+import KeyboardState from '../models/state/keyboard'
 import LayerWindow from './LayerWindow'
 import { KonvaEventObject, Node, NodeConfig } from 'konva/lib/Node'
 import { DEFAULT_POS } from '../models/base'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import Konva from 'konva'
 import { Transformer } from 'react-konva'
 import Text from '../models/Elements/Text'
 
 export type KonvaComponentT = Konva.Ellipse | Konva.Rect | Konva.Line | null
 
-const createdComposite = new CreatedComposite()
+export const createdComposite = new CreatedComposite()
+const keyboardState = new KeyboardState()
 
 function Editor() {
   const layerRef = useRef<Konva.Layer | null>(null)
@@ -43,22 +45,7 @@ function Editor() {
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
     const element = createdComposite.get().find(el => el.id === parseInt(e.target.attrs.id))
 
-    if (e.evt.shiftKey) {
-      if (element) {
-        if (createdComposite.isInSelectionManager(element)) {
-          createdComposite.deselect(element)
-        } else {
-          createdComposite.select(element)
-        }
-      }
-    } else {
-      if (element) {
-        createdComposite.deselectAll()
-        createdComposite.select(element)
-      } else {
-        createdComposite.deselectAll()
-      }
-    }
+    keyboardState.handleClickElement(element)
     handleTransformer()
   }
 
@@ -111,6 +98,28 @@ function Editor() {
     e.currentTarget.scaleX(1)
     e.currentTarget.scaleY(1)
   }
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Shift') {
+      keyboardState.pressShift()
+    }
+  }
+
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (e.key === 'Shift') {
+      keyboardState.releaseShift()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+    }
+  })
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', display: 'flex' }}>
