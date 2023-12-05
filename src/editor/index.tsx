@@ -12,12 +12,15 @@ import KeyboardState from '../models/state/keyboard'
 import LayerWindow from './LayerWindow'
 import { KonvaEventObject, Node, NodeConfig } from 'konva/lib/Node'
 import { DEFAULT_POS } from '../models/base'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Transformer } from 'react-konva'
 import Text from '../models/Elements/Text'
-
-export type KonvaComponentT = Konva.Ellipse | Konva.Rect | Konva.Line | null
+import Ellipse from '../models/Elements/Shapes/ellipse'
+import Line from '../models/Elements/Shapes/line'
+import Rectangle from '../models/Elements/Shapes/rectangle'
+import Image from '../models/Elements/Image'
+// export type KonvaComponentT = Konva.Ellipse | Konva.Rect | Konva.Line | null
 
 export const createdComposite = new CreatedComposite()
 const keyboardState = new KeyboardState()
@@ -28,7 +31,7 @@ function Editor() {
 
   const [updateShapes, setUpdateShapes] = useState(false)
 
-  createdComposite.listenForShapeChanges(() => {
+  createdComposite.listenForElementChanges(() => {
     setUpdateShapes(!updateShapes)
   })
 
@@ -154,6 +157,10 @@ function Editor() {
                   return <RectView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
                 else if (el instanceof Line)
                   return <LineView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
+                else if (el instanceof Text)
+                  return <TextView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
+                else if (el instanceof Image)
+                  return <ImageView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
                 else return null
               })}
               <Transformer
@@ -177,8 +184,8 @@ function Editor() {
           <LayerWindow
             createdComposite={createdComposite}
             layerRef={layerRef}
-            shapeListener={() => {
-              createdComposite.listenForShapeChanges(() => {
+            elementListener={() => {
+              createdComposite.listenForElementChanges(() => {
                 setUpdateShapes(!updateShapes)
               })
             }}

@@ -1,11 +1,12 @@
+import getNewPosition from '../../utils/newPosition'
 import getRandomColor from '../../utils/randomColor'
-import { DEFAULT_POS, DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
+import { DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
 
 abstract class Elements {
   public id: number
   public selected: boolean = false
   public size: Size = DEFAULT_SIZE
-  public position: Position = DEFAULT_POS
+  public position: Position = getNewPosition()
   public zIndex: ZIndex = 0
 
   constructor(id: number) {
@@ -17,7 +18,7 @@ abstract class Elements {
 }
 
 export abstract class Shapes extends Elements {
-  public color: string = DEFAULT_COLOR
+  public color: string = getRandomColor()
 }
 
 export default Elements

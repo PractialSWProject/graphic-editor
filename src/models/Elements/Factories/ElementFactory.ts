@@ -28,30 +28,3 @@ class ElementFactory extends AbstractFactory {
 }
 
 export default ElementFactory
-
-// Usage
-// const shapeFactory = new ShapeFactory();
-
-// const line = shapeFactory.createLine();
-// line.setProperties({
-//   size: { width: 50, height: 5 },
-//   position: { x: 10, y: 10 },
-//   zIndex: 1,
-// });
-// line.draw();
-
-// const ellipse = shapeFactory.createEllipse();
-// ellipse.setProperties({
-//   size: { width: 30, height: 20 },
-//   position: { x: 50, y: 50 },
-//   zIndex: 2,
-// });
-// ellipse.draw();
-
-// const rectangle = shapeFactory.createRectangle();
-// rectangle.setProperties({
-//   size: { width: 40, height: 30 },
-//   position: { x: 100, y: 100 },
-//   zIndex: 3,
-// });
-// rectangle.draw();

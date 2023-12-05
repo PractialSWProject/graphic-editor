@@ -1,8 +1,4 @@
 import Elements, { Shapes } from '../Elements'
-import Image from '../Elements/Image'
-import Ellipse from '../Elements/Shapes/ellipse'
-import Line from '../Elements/Shapes/line'
-import Rectangle from '../Elements/Shapes/rectangle'
 import Text from '../Elements/Text'
 import { Position, Size } from '../base'
 
@@ -13,24 +9,13 @@ class CreatedComposite {
   private selected: Elements[] = []
 
   // listeners
-  private shapeChangeListener: ChangeListener | null = null
+  private elementChangeListener: ChangeListener | null = null
   private layerChangeListener: ChangeListener | null = null
   private propertyWindowListener: ChangeListener | null = null
 
   create(element: Elements) {
     this.created.push(element)
-    this.notifyShapeChanges()
-  }
-
-  destroy(id: number) {
-    this.created.forEach(element => {
-      if (element.id === id) {
-        element.deleted = true
-      }
-    })
-    this.selected = this.selected.filter(el => el.id !== id)
-    this.notifyShapeChanges()
-    this.notifyLayerChanges()
+    this.notifyElementChanges()
   }
 
   clear() {
@@ -44,14 +29,14 @@ class CreatedComposite {
   select(element: Elements) {
     this.selected.push(element)
     element.selected = true
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
     this.notifyPropertyWindowChanges()
   }
 
   deselect(element: Elements) {
     this.selected = this.selected.filter(el => el.id !== element.id)
     element.selected = false
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -61,7 +46,7 @@ class CreatedComposite {
     })
     this.selected = []
 
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -82,7 +67,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -93,7 +78,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -104,7 +89,7 @@ class CreatedComposite {
       }
     })
     this.notifyPropertyWindowChanges()
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
   }
 
   updateFontSize(id: number, fontSize: number) {
@@ -115,7 +100,7 @@ class CreatedComposite {
       console.log('element', element)
     })
     this.notifyPropertyWindowChanges()
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyElementChanges()
   }
 
   updateZIndex(id: number, zIndex: number) {
@@ -125,43 +110,15 @@ class CreatedComposite {
       }
     })
     this.notifyLayerChanges()
-    this.notifyShapeChanges()
+    this.notifyElementChanges()
   }
 
-  getRectangles(): Array<Rectangle> {
-    return this.created.filter(el => el instanceof Rectangle) as Array<Rectangle>
-  }
-
-  getLines(): Array<Line> {
-    return this.created.filter(el => el instanceof Line) as Array<Line>
-  }
-
-  getEllipse(): Array<Ellipse> {
-    return this.created.filter(el => el instanceof Ellipse) as Array<Ellipse>
-  }
-
-  listenForShapeChanges(listener: ChangeListener) {
-    if (this.shapeChangeListener) {
-      this.shapeChangeListener = null
+  listenForElementChanges(listener: ChangeListener) {
+    if (this.elementChangeListener) {
+      this.elementChangeListener = null
     }
 
-    this.shapeChangeListener = listener
-  }
-
-  listenForTextChanges(listener: ChangeListener) {
-    if (this.textChangeListener) {
-      this.textChangeListener = null
-    }
-
-    this.textChangeListener = listener
-  }
-
-  listenForImageChanges(listener: ChangeListener) {
-    if (this.imageChangeListener) {
-      this.imageChangeListener = null
-    }
-
-    this.imageChangeListener = listener
+    this.elementChangeListener = listener
   }
 
   listenForLayerChanges(listener: ChangeListener) {
@@ -190,11 +147,11 @@ class CreatedComposite {
     }
   }
 
-  private notifyShapeChanges() {
+  private notifyElementChanges() {
     this.notifyLayerChanges()
 
-    if (this.shapeChangeListener) {
-      this.shapeChangeListener()
+    if (this.elementChangeListener) {
+      this.elementChangeListener()
     }
   }
 }

@@ -6,15 +6,15 @@ import Elements from '../../models/Elements'
 import { Box, Button, ButtonGroup } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-// import { DeleteOutline } from '@mui/icons-material'
+import Konva from 'konva'
 
 interface Props {
   createdComposite: CreatedComposite
   layerRef: React.MutableRefObject<any>
-  shapeListener: () => void
+  elementListener: () => void
 }
 
-const LayerWindow = ({ createdComposite, layerRef, shapeListener }: Props) => {
+const LayerWindow = ({ createdComposite, layerRef, elementListener }: Props) => {
   const createdElements = createdComposite.get()
   const layerRefCurrent = layerRef.current
 
@@ -44,16 +44,18 @@ const LayerWindow = ({ createdComposite, layerRef, shapeListener }: Props) => {
     const elementWithNewZIndex = createdElements.find(el => el.zIndex === newZIndex)
 
     if (layerRefCurrent) {
-      const node = layerRefCurrent.findOne('#' + element.id)
-      const nodeWithNewZIndex = layerRefCurrent.findOne('#' + elementWithNewZIndex?.id)
+      const node = layerRefCurrent.getChildren().find((node: Konva.Shape) => Number(node.attrs.id) === element.id)
+      const nodeWithNewZIndex = layerRefCurrent
+        .getChildren()
+        .find((node: Konva.Shape) => Number(node.attrs.id) === elementWithNewZIndex?.id)
 
-      node.zIndex(newZIndex)
-      nodeWithNewZIndex?.zIndex(currentZIdex)
+      const newNodeZIndex = node.zIndex()
 
-      layerRefCurrent.getChildren().sort((a: any, b: any) => a.zIndex() - b.zIndex())
+      node.zIndex(nodeWithNewZIndex.zIndex())
+      nodeWithNewZIndex.zIndex(newNodeZIndex)
       layerRefCurrent.draw()
 
-      shapeListener()
+      elementListener()
     }
 
     if (elementWithNewZIndex) {
@@ -69,11 +71,6 @@ const LayerWindow = ({ createdComposite, layerRef, shapeListener }: Props) => {
   const handleZIndexDown = (element: Elements) => {
     handleZIndexChange(element, 'down')
   }
-
-  // const handleDeleteLayer = (id: number) => {
-  //   console.log(id)
-  //   createdComposite.destroy(id)
-  // }
 
   const columns: GridColDef[] = [
     {
@@ -117,20 +114,6 @@ const LayerWindow = ({ createdComposite, layerRef, shapeListener }: Props) => {
         </Box>
       )
     }
-    // TODO : next phase
-    // {
-    //   field: 'delete',
-    //   width: 100,
-    //   renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
-    //     <Button
-    //       onClick={() => {
-    //         handleDeleteLayer(params.value)
-    //       }}
-    //     >
-    //       <DeleteOutline color="secondary" />
-    //     </Button>
-    //   )
-    // }
   ]
 
   return <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />

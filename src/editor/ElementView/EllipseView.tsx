@@ -1,25 +1,25 @@
 import { KonvaEventObject } from 'konva/lib/Node'
-import { Ellipse } from 'react-konva'
-import Elements from '../../models/Elements'
+import { Ellipse as EllipseK } from 'react-konva'
+import { Shapes } from '../../models/Elements'
 
 interface Props {
-  el: Elements
+  el: Shapes
   handleMove: (e: KonvaEventObject<DragEvent>) => void
   handleEnlarge: (e: KonvaEventObject<Event>) => void
 }
 
 const EllipseView = ({ el, handleMove, handleEnlarge }: Props) => {
-  if (el.deleted) return null
   return (
-    <Ellipse
+    <EllipseK
+      key={el.id}
       id={el.id.toString()}
-      x={el.properties.position.x}
-      y={el.properties.position.y}
-      width={el.properties.size.width}
-      height={el.properties.size.height}
-      radiusX={el.properties.size.width / 2}
-      radiusY={el.properties.size.height / 2}
-      fill={el.properties.color}
+      x={el.position.x}
+      y={el.position.y}
+      width={el.size.width}
+      height={el.size.height}
+      radiusX={el.size.width / 2}
+      radiusY={el.size.height / 2}
+      fill={el.color}
       shadowBlur={10}
       shadowColor="lime"
       shadowEnabled={el.selected ? true : false}
