@@ -26,6 +26,12 @@ function Editor() {
   const layerRef = useRef<Konva.Layer | null>(null)
   const trRef = useRef<Konva.Transformer | null>(null)
 
+  const [updateShapes, setUpdateShapes] = useState(false)
+
+  createdComposite.listenForShapeChanges(() => {
+    setUpdateShapes(!updateShapes)
+  })
+
   const handleTransformer = () => {
     const layerRefCurrent = layerRef.current
 
@@ -141,11 +147,15 @@ function Editor() {
             onClick={e => handleClick(e)}
           >
             <Layer ref={layerRef}>
-              <RectView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
-              <EllipseView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
-              <LineView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
-              <TextView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
-              <ImageView createdComposite={createdComposite} handleMove={handleMove} handleEnlarge={handleEnlarge} />
+              {createdComposite.get().map((el, idx) => {
+                if (el instanceof Ellipse)
+                  return <EllipseView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
+                else if (el instanceof Rectangle)
+                  return <RectView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
+                else if (el instanceof Line)
+                  return <LineView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />
+                else return null
+              })}
               <Transformer
                 ref={trRef}
                 boundBoxFunc={(oldBox, newBox) => {
@@ -164,7 +174,15 @@ function Editor() {
           <PropertyWindow createdComposite={createdComposite} />
         </Box>
         <Box sx={{ height: '50vh' }}>
-          <LayerWindow createdComposite={createdComposite} />
+          <LayerWindow
+            createdComposite={createdComposite}
+            layerRef={layerRef}
+            shapeListener={() => {
+              createdComposite.listenForShapeChanges(() => {
+                setUpdateShapes(!updateShapes)
+              })
+            }}
+          />
         </Box>
       </Box>
     </Box>

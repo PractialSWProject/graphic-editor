@@ -13,21 +13,24 @@ class CreatedComposite {
   private selected: Elements[] = []
 
   // listeners
-  private rectChangeListener: ChangeListener | null = null
-  private lineChangeListener: ChangeListener | null = null
-  private ellipseChangeListener: ChangeListener | null = null
-  private textChangeListener: ChangeListener | null = null
-  private imageChangeListener: ChangeListener | null = null
+  private shapeChangeListener: ChangeListener | null = null
   private layerChangeListener: ChangeListener | null = null
   private propertyWindowListener: ChangeListener | null = null
 
   create(element: Elements) {
     this.created.push(element)
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
   }
 
-  destroy(element: Elements) {
-    this.created = this.created.filter(el => el.id !== element.id)
+  destroy(id: number) {
+    this.created.forEach(element => {
+      if (element.id === id) {
+        element.deleted = true
+      }
+    })
+    this.selected = this.selected.filter(el => el.id !== id)
+    this.notifyShapeChanges()
+    this.notifyLayerChanges()
   }
 
   clear() {
@@ -41,14 +44,14 @@ class CreatedComposite {
   select(element: Elements) {
     this.selected.push(element)
     element.selected = true
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
   deselect(element: Elements) {
     this.selected = this.selected.filter(el => el.id !== element.id)
     element.selected = false
-    this.notifyBasedOnType(element)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -58,11 +61,7 @@ class CreatedComposite {
     })
     this.selected = []
 
-    this.notifyEllipseChanges()
-    this.notifyLineChanges()
-    this.notifyRectChanges()
-    this.notifyTextChanges()
-    this.notifyImageChanges()
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -83,7 +82,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -94,7 +93,7 @@ class CreatedComposite {
       }
     })
 
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
     this.notifyPropertyWindowChanges()
   }
 
@@ -105,7 +104,7 @@ class CreatedComposite {
       }
     })
     this.notifyPropertyWindowChanges()
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
   }
 
   updateFontSize(id: number, fontSize: number) {
@@ -126,7 +125,7 @@ class CreatedComposite {
       }
     })
     this.notifyLayerChanges()
-    this.notifyBasedOnType(this.created.find(el => el.id === id) as Elements)
+    this.notifyShapeChanges()
   }
 
   getRectangles(): Array<Rectangle> {
@@ -141,36 +140,12 @@ class CreatedComposite {
     return this.created.filter(el => el instanceof Ellipse) as Array<Ellipse>
   }
 
-  getText(): Array<Text> {
-    return this.created.filter(el => el instanceof Text) as Array<Text>
-  }
-
-  getImage(): Array<Image> {
-    return this.created.filter(el => el instanceof Image) as Array<Image>
-  }
-
-  listenForRectChanges(listener: ChangeListener) {
-    if (this.rectChangeListener) {
-      this.rectChangeListener = null
+  listenForShapeChanges(listener: ChangeListener) {
+    if (this.shapeChangeListener) {
+      this.shapeChangeListener = null
     }
 
-    this.rectChangeListener = listener
-  }
-
-  listenForEllipseChanges(listener: ChangeListener) {
-    if (this.ellipseChangeListener) {
-      this.ellipseChangeListener = null
-    }
-
-    this.ellipseChangeListener = listener
-  }
-
-  listenForLineChanges(listener: ChangeListener) {
-    if (this.lineChangeListener) {
-      this.lineChangeListener = null
-    }
-
-    this.lineChangeListener = listener
+    this.shapeChangeListener = listener
   }
 
   listenForTextChanges(listener: ChangeListener) {
@@ -215,49 +190,11 @@ class CreatedComposite {
     }
   }
 
-  private notifyRectChanges() {
-    if (this.rectChangeListener) {
-      this.rectChangeListener()
-    }
-  }
-
-  private notifyLineChanges() {
-    if (this.lineChangeListener) {
-      this.lineChangeListener()
-    }
-  }
-
-  private notifyEllipseChanges() {
-    if (this.ellipseChangeListener) {
-      this.ellipseChangeListener()
-    }
-  }
-
-  private notifyTextChanges() {
-    if (this.textChangeListener) {
-      this.textChangeListener()
-    }
-  }
-
-  private notifyImageChanges() {
-    if (this.imageChangeListener) {
-      this.imageChangeListener()
-    }
-  }
-
-  notifyBasedOnType(element: Elements) {
+  private notifyShapeChanges() {
     this.notifyLayerChanges()
 
-    if (element instanceof Rectangle) {
-      this.notifyRectChanges()
-    } else if (element instanceof Line) {
-      this.notifyLineChanges()
-    } else if (element instanceof Ellipse) {
-      this.notifyEllipseChanges()
-    } else if (element instanceof Text) {
-      this.notifyTextChanges()
-    } else if (element instanceof Image) {
-      this.notifyImageChanges()
+    if (this.shapeChangeListener) {
+      this.shapeChangeListener()
     }
   }
 }

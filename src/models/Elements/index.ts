@@ -1,4 +1,5 @@
-import { DEFAULT_COLOR, DEFAULT_POS, DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
+import getRandomColor from '../../utils/randomColor'
+import { DEFAULT_POS, DEFAULT_SIZE, Position, Size, ZIndex } from '../base'
 
 abstract class Elements {
   public id: number
