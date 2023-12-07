@@ -116,7 +116,11 @@ const LayerWindow = ({ createdComposite, layerRef, elementListener }: Props) => 
     }
   ]
 
-  return <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />
+  return (
+    <Box height={'50vh'}>
+      <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />
+    </Box>
+  )
 }
 
 export default LayerWindow

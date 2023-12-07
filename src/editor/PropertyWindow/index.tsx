@@ -47,8 +47,8 @@ function PropertyWindow({ createdComposite }: Props) {
   }
 
   return (
-    <Box>
-      <Box style={{ height: 50, backgroundColor: '#434343' }}></Box>
+    <Box height={'50vh'}>
+      <Box style={{ height: '7vh', backgroundColor: '#434343' }}></Box>
       <Divider sx={{ borderColor: '#333' }} />
       <Box style={{ backgroundColor: '#434343', display: 'flex', flexDirection: 'column' }}>
         <Grid container spacing={2}>
@@ -124,8 +124,7 @@ function PropertyWindow({ createdComposite }: Props) {
           </Grid>
         </Grid>
         {selected.length !== 0 && (selected[0] instanceof Shapes || selected[0] instanceof Text) && (
-          <Box padding={2}>
-            <Divider sx={{ borderColor: '#333', mb: 2 }} />
+          <Box paddingX={2}>
             <Typography variant="body2" color={'#C7C7C7'}>
               Fill
             </Typography>

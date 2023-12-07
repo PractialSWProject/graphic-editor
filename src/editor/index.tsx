@@ -137,7 +137,7 @@ function Editor() {
         <Box
           sx={{
             display: 'flex',
-            height: '90vh',
+            height: '93vh',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: 'darkgray'
