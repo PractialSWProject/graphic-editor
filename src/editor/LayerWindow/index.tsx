@@ -1,96 +1,100 @@
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import CreatedComposite from '../../models/composite/created'
 import { useState } from 'react'
 import LayerInfo from './LayerInfo'
-import Elements from '../../models/Elements'
-import { Box, Button, ButtonGroup } from '@mui/material'
+import { Box, Button, ButtonGroup, Typography, styled } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import Konva from 'konva'
+import ElementListSingleton from '../../models/singleton'
+import { ConcreteElement } from '../../models/concrete'
 
 interface Props {
-  createdComposite: CreatedComposite
   layerRef: React.MutableRefObject<any>
-  elementListener: () => void
 }
 
-const LayerWindow = ({ createdComposite, layerRef, elementListener }: Props) => {
-  const createdElements = createdComposite.get()
+const elementListSingleton = ElementListSingleton.getInstance()
+
+const LayerWindow = ({ layerRef }: Props) => {
+  const createdElements = elementListSingleton.getElements()
   const layerRefCurrent = layerRef.current
 
   const [updateLayers, setUpdateLayers] = useState(false)
 
-  createdComposite.listenForLayerChanges(() => {
+  elementListSingleton.setLayerChangeListener(() => {
     setUpdateLayers(!updateLayers)
   })
 
   let rows = createdElements.map((el, index) => ({
-    id: el.id,
+    id: el.getId(),
     shape: el,
     rowId: index,
     name: el,
-    zIndex: el.zIndex,
-    zIndexChange: el
+    zIndex: el.getZIndex(),
+    zIndexChange: el,
+    isSelected: el.getIsSelected()
   }))
 
   rows = rows.sort((a, b) => b.zIndex - a.zIndex)
   const maxZIndex = rows.length
 
-  const handleZIndexChange = (element: Elements, direction: 'up' | 'down') => {
+  const handleZIndexChange = (element: ConcreteElement, direction: 'up' | 'down') => {
     const zIndexChange = direction === 'up' ? 1 : -1
-    const currentZIdex = element.zIndex
+    const currentZIdex = element.getZIndex()
     const newZIndex = currentZIdex + zIndexChange
 
-    const elementWithNewZIndex = createdElements.find(el => el.zIndex === newZIndex)
+    const elementWithNewZIndex = createdElements.find(el => el.getZIndex() === newZIndex)
 
     if (layerRefCurrent) {
-      const node = layerRefCurrent.getChildren().find((node: Konva.Shape) => Number(node.attrs.id) === element.id)
+      const node = layerRefCurrent.getChildren().find((node: Konva.Shape) => Number(node.attrs.id) === element.getId())
       const nodeWithNewZIndex = layerRefCurrent
         .getChildren()
-        .find((node: Konva.Shape) => Number(node.attrs.id) === elementWithNewZIndex?.id)
+        .find((node: Konva.Shape) => Number(node.attrs.id) === elementWithNewZIndex?.getId())
 
       const newNodeZIndex = node.zIndex()
 
       node.zIndex(nodeWithNewZIndex.zIndex())
       nodeWithNewZIndex.zIndex(newNodeZIndex)
       layerRefCurrent.draw()
-
-      elementListener()
     }
 
     if (elementWithNewZIndex) {
-      createdComposite.updateZIndex(element.id, newZIndex)
-      createdComposite.updateZIndex(elementWithNewZIndex.id, currentZIdex)
+      elementListSingleton.updateZIndex(element.getId(), newZIndex)
+      elementListSingleton.updateZIndex(elementWithNewZIndex.getId(), currentZIdex)
     }
   }
 
-  const handleZIndexUp = (element: Elements) => {
+  const handleZIndexUp = (element: ConcreteElement) => {
     handleZIndexChange(element, 'up')
   }
 
-  const handleZIndexDown = (element: Elements) => {
+  const handleZIndexDown = (element: ConcreteElement) => {
     handleZIndexChange(element, 'down')
   }
+
+  // const handleClickRow: (params: GridRowParams) => void = params => {
+  //   const element = elementListSingleton.getElements().find(el => el.getId() === params.row.id);
+  //   keyboardState.handleClickElement(element);
+  // };
 
   const columns: GridColDef[] = [
     {
       field: 'shape',
       width: 25,
-      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: ConcreteElement; rowId: number }>) => (
         <LayerInfo element={params.value} isIcon />
       )
     },
     {
       field: 'name',
       width: 150,
-      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: ConcreteElement; rowId: number }>) => (
         <LayerInfo element={params.value} />
       )
     },
     {
       field: 'zIndexChange',
       width: 100,
-      renderCell: (params: GridRenderCellParams<{ id: number; shape: Elements; rowId: number }>) => (
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: ConcreteElement; rowId: number }>) => (
         <Box>
           <ButtonGroup variant="text" aria-label="text button group" size="small" sx={{ color: 'white' }}>
             <Button
@@ -117,10 +121,28 @@ const LayerWindow = ({ createdComposite, layerRef, elementListener }: Props) => 
   ]
 
   return (
-    <Box height={'50vh'}>
-      <DataGrid rows={rows} columns={columns} hideFooter columnHeaderHeight={0} />
+    <Box height={'50vh'} sx={{ backgroundColor: '#FFF' }}>
+      <Typography variant="subtitle1" sx={{ color: '#C7C7C7', padding: 2 }}>
+        레이어
+      </Typography>
+      <StyledDataGrid
+        rows={rows}
+        columns={columns}
+        hideFooter
+        columnHeaderHeight={0}
+        getRowClassName={params => (params.row.isSelected ? 'isSelected' : '')}
+      />
     </Box>
   )
 }
 
 export default LayerWindow
+
+const StyledDataGrid = styled(DataGrid)`
+  .isSelected {
+    background-color: #666;
+    &:hover {
+      background-color: #777;
+    }
+  }
+`

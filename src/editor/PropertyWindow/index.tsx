@@ -1,23 +1,21 @@
 import { Box, Dialog, Divider, Grid, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { SketchPicker } from 'react-color'
-import CreatedComposite from '../../models/composite/created'
-import Text from '../../models/Elements/Text'
-import { Shapes } from '../../models/Elements'
+// import Text from '../../models/Elements/Text'
+import ElementListSingleton from '../../models/singleton'
+import { ConcreteShape, ConcreteText } from '../../models/concrete'
 
-interface Props {
-  createdComposite: CreatedComposite
-}
+const elementListSingleton = ElementListSingleton.getInstance()
 
-function PropertyWindow({ createdComposite }: Props) {
+function PropertyWindow() {
   const [isOpenPalette, setIsOpenPalette] = useState(false)
   const [updateProperty, setUpdateProperty] = useState(false)
 
-  createdComposite.listenForPropertyWindow(() => {
+  elementListSingleton.setPropertyWindowListener(() => {
     setUpdateProperty(!updateProperty)
   })
 
-  const selected = createdComposite.getSelected()
+  const selected = elementListSingleton.getSelected()
 
   const handleOpenPalette = () => {
     if (selected.length > 1) return
@@ -25,30 +23,34 @@ function PropertyWindow({ createdComposite }: Props) {
   }
 
   const handleChangeColor = (color: { hex: string }) => {
-    createdComposite.updateColor(selected[0].id, color.hex)
+    elementListSingleton.updateColor(selected[0].getId(), color.hex)
   }
 
   const handleChangePosition = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, xy: string) => {
     const newXY = parseFloat(e.target.value)
     if (!isNaN(newXY)) {
-      const currentPosition = selected[0].position
+      const currentPosition = selected[0].getPosition()
       const newPosition = xy === 'x' ? { ...currentPosition, x: newXY } : { ...currentPosition, y: newXY }
-      createdComposite.updatePosition(selected[0].id, newPosition)
+      elementListSingleton.updatePosition(selected[0].getId(), newPosition)
     }
   }
 
   const handleChangeSize = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, wh: string) => {
     const newWH = parseFloat(e.target.value)
     if (!isNaN(newWH)) {
-      const currentPosition = selected[0].size
-      const newSize = wh === 'height' ? { ...currentPosition, height: newWH } : { ...currentPosition, width: newWH }
-      createdComposite.updateSize(selected[0].id, newSize)
+      const currentSize = selected[0].getSize()
+      const newSize = wh === 'height' ? { ...currentSize, height: newWH } : { ...currentSize, width: newWH }
+      elementListSingleton.updateSize(selected[0].getId(), newSize)
     }
   }
 
   return (
     <Box height={'50vh'}>
-      <Box style={{ height: '7vh', backgroundColor: '#434343' }}></Box>
+      <Box style={{ height: '7vh', backgroundColor: '#434343' }} display={'flex'} alignItems={'center'}>
+        <Typography variant="subtitle1" sx={{ color: '#C7C7C7', padding: 2 }}>
+          속성창
+        </Typography>
+      </Box>
       <Divider sx={{ borderColor: '#333' }} />
       <Box style={{ backgroundColor: '#434343', display: 'flex', flexDirection: 'column' }}>
         <Grid container spacing={2}>
@@ -64,7 +66,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangePosition(e, 'x')}
-                value={selected.length === 1 && Math.floor(selected[0].position.x)}
+                value={selected.length === 1 && Math.floor(selected[0].getPosition().x)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -81,7 +83,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangePosition(e, 'y')}
-                value={selected.length === 1 && Math.floor(selected[0].position.y)}
+                value={selected.length === 1 && Math.floor(selected[0].getPosition().y)}
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -100,7 +102,9 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangeSize(e, 'width')}
-                value={selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].size.width)}
+                value={
+                  selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].getSize().width)
+                }
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
@@ -117,13 +121,15 @@ function PropertyWindow({ createdComposite }: Props) {
                 inputProps={{ style: { color: 'white' } }}
                 type="number"
                 onChange={e => handleChangeSize(e, 'height')}
-                value={selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].size.height)}
+                value={
+                  selected.length === 1 && !(selected[0] instanceof Text) && Math.floor(selected[0].getSize().height)
+                }
                 sx={{ backgroundColor: selected.length > 1 ? '#565656' : undefined }}
               />
             </Box>
           </Grid>
         </Grid>
-        {selected.length !== 0 && (selected[0] instanceof Shapes || selected[0] instanceof Text) && (
+        {selected.length !== 0 && (selected[0] instanceof ConcreteShape || selected[0] instanceof ConcreteText) && (
           <Box paddingX={2}>
             <Typography variant="body2" color={'#C7C7C7'}>
               Fill
@@ -133,7 +139,7 @@ function PropertyWindow({ createdComposite }: Props) {
                 sx={{
                   width: 20,
                   height: 20,
-                  backgroundColor: selected.length === 1 ? selected[0].color : '#FFF',
+                  backgroundColor: selected.length === 1 ? selected[0].getColor() : '#FFF',
                   borderRadius: 2,
                   mr: 2,
                   border: '0.5px solid white'
@@ -141,15 +147,18 @@ function PropertyWindow({ createdComposite }: Props) {
                 onClick={handleOpenPalette}
               />
               <Typography variant="body1" marginRight={2} color={'#C7C7C7'}>
-                {selected.length === 0 ? '' : selected.length === 1 ? selected[0].color : 'Mixed'}
+                {selected.length === 0 ? '' : selected.length === 1 ? selected[0].getColor() : 'Mixed'}
               </Typography>
             </Box>
           </Box>
         )}
       </Box>
-      {(selected[0] instanceof Shapes || selected[0] instanceof Text) && (
+      {(selected[0] instanceof ConcreteShape || selected[0] instanceof ConcreteText) && (
         <Dialog open={isOpenPalette} onClose={() => setIsOpenPalette(false)}>
-          <SketchPicker color={selected.length ? selected[0].color : '#FFF'} onChangeComplete={handleChangeColor} />
+          <SketchPicker
+            color={selected.length ? selected[0].getColor() : '#FFF'}
+            onChangeComplete={handleChangeColor}
+          />
         </Dialog>
       )}
     </Box>
