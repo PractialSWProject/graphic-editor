@@ -1,31 +1,32 @@
-import Elements from '../Elements'
-import { createdComposite } from '../../editor'
+import { ConcreteElement } from '../concrete'
+import ElementListSingleton from '../singleton'
 
+const elementListSingleton = ElementListSingleton.getInstance()
 // State 인터페이스
 abstract class ShiftState {
-  public abstract handleClickElement(element: Elements | undefined): void
+  public abstract handleClickElement(element: ConcreteElement | undefined): void
 }
 
 // ConcreteState: Shift 키가 눌리지 않은 상태
 class NotPressedState extends ShiftState {
-  public handleClickElement(element: Elements): void {
+  public handleClickElement(element: ConcreteElement): void {
     if (element) {
-      createdComposite.deselectAll()
-      createdComposite.select(element)
+      elementListSingleton.deselectAll()
+      elementListSingleton.select(element)
     } else {
-      createdComposite.deselectAll()
+      elementListSingleton.deselectAll()
     }
   }
 }
 
 // ConcreteState: Shift 키가 눌린 상태
 class PressedState extends ShiftState {
-  public handleClickElement(element: Elements): void {
+  public handleClickElement(element: ConcreteElement): void {
     if (element) {
-      if (createdComposite.isInSelectionManager(element)) {
-        createdComposite.deselect(element)
+      if (elementListSingleton.isInSelectionManager(element)) {
+        elementListSingleton.deselect(element)
       } else {
-        createdComposite.select(element)
+        elementListSingleton.select(element)
       }
     }
   }
@@ -47,7 +48,7 @@ class KeyboardState {
     this.currentState = new NotPressedState()
   }
 
-  handleClickElement(element: Elements | undefined): void {
+  handleClickElement(element: ConcreteElement | undefined): void {
     this.currentState.handleClickElement(element)
   }
 }

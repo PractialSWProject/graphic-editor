@@ -1,7 +1,6 @@
 import { Box, Dialog, Divider, Grid, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { SketchPicker } from 'react-color'
-// import Text from '../../models/Elements/Text'
 import ElementListSingleton from '../../models/singleton'
 import { ConcreteShape, ConcreteText } from '../../models/concrete'
 
