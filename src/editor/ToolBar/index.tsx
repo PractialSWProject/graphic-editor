@@ -8,8 +8,8 @@ import line from '../../assets/line.svg'
 import Button from './Button'
 import TextInput from './TextInput'
 import ElementListSingleton from '../../models/singleton'
-import { ConcreteFactory } from '../../models/concrete'
-import { ELLIPSE, LINE, RECTANGLE } from '../../models/abstract'
+import { ConcreteFactory } from '../../models/factory'
+import { ELLIPSE, LINE, RECTANGLE } from '../../models/elementAbstract'
 
 let ID = 1
 

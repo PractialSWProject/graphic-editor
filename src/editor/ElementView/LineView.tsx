@@ -1,6 +1,6 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Line } from 'react-konva'
-import { ConcreteShape } from '../../models/concrete'
+import { ConcreteShape } from '../../models/elementConcrete'
 interface Props {
   el: ConcreteShape
   handleMove: (e: KonvaEventObject<DragEvent>, isLine?: boolean) => void

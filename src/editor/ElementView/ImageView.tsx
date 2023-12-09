@@ -1,6 +1,6 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Image as ImageK } from 'react-konva'
-import { ConcreteImage } from '../../models/concrete'
+import { ConcreteImage } from '../../models/elementConcrete'
 
 interface Props {
   el: ConcreteImage

@@ -1,4 +1,4 @@
-import { DEFAULT_POS } from '../models/base'
+import { DEFAULT_POS } from '../models/elementAbstract'
 
 let newPosition = DEFAULT_POS
 

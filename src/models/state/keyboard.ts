@@ -1,4 +1,4 @@
-import { ConcreteElement } from '../concrete'
+import { ConcreteElement } from '../elementConcrete'
 import ElementListSingleton from '../singleton'
 
 const elementListSingleton = ElementListSingleton.getInstance()

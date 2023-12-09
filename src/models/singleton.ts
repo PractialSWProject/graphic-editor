@@ -1,6 +1,6 @@
 // elementListSingleton.ts
-import { Position, Size } from './abstract'
-import { ConcreteElement, ConcreteShape, ConcreteText } from './concrete'
+import { Position, Size } from './elementAbstract'
+import { ConcreteElement, ConcreteShape, ConcreteText } from './elementConcrete'
 
 type ChangeListener = () => void
 

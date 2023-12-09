@@ -1,6 +1,6 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Ellipse as EllipseK } from 'react-konva'
-import { ConcreteShape } from '../../models/concrete'
+import { ConcreteShape } from '../../models/elementConcrete'
 
 interface Props {
   el: ConcreteShape

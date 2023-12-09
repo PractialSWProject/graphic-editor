@@ -1,8 +1,8 @@
 import { Circle, Rectangle as RectIcon, Remove, Title, Image as ImageIcon } from '@mui/icons-material'
 import { Typography } from '@mui/material'
 
-import { ConcreteElement, ConcreteShape, ConcreteText } from '../../models/concrete'
-import { ELLIPSE, LINE } from '../../models/abstract'
+import { ConcreteElement, ConcreteShape, ConcreteText } from '../../models/elementConcrete'
+import { ELLIPSE, LINE } from '../../models/elementAbstract'
 interface Props {
   element: ConcreteElement
   isIcon?: boolean

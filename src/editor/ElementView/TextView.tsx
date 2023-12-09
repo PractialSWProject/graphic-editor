@@ -1,6 +1,6 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Text as TextK } from 'react-konva'
-import { ConcreteText } from '../../models/concrete'
+import { ConcreteText } from '../../models/elementConcrete'
 
 interface Props {
   el: ConcreteText

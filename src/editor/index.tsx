@@ -10,13 +10,12 @@ import PropertyWindow from './PropertyWindow'
 import KeyboardState from '../models/state/keyboard'
 import LayerWindow from './LayerWindow'
 import { KonvaEventObject, Node, NodeConfig } from 'konva/lib/Node'
-import { DEFAULT_POS } from '../models/base'
 import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Transformer } from 'react-konva'
-import { ConcreteImage, ConcreteShape, ConcreteText } from '../models/concrete'
+import { ConcreteImage, ConcreteShape, ConcreteText } from '../models/elementConcrete'
 import ElementListSingleton from '../models/singleton'
-import { ELLIPSE, RECTANGLE } from '../models/abstract'
+import { ELLIPSE, RECTANGLE, DEFAULT_POS } from '../models/elementAbstract'
 
 const keyboardState = new KeyboardState()
 

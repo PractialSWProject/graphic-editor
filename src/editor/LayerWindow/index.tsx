@@ -6,7 +6,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import Konva from 'konva'
 import ElementListSingleton from '../../models/singleton'
-import { ConcreteElement } from '../../models/concrete'
+import { ConcreteElement } from '../../models/elementConcrete'
 
 interface Props {
   layerRef: React.MutableRefObject<any>
@@ -145,4 +145,5 @@ const StyledDataGrid = styled(DataGrid)`
       background-color: #777;
     }
   }
+  height: 100%;
 `
