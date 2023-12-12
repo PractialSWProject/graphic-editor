@@ -1,9 +1,8 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Line } from 'react-konva'
-import { Shapes } from '../../models/Elements'
-
+import { ConcreteShape } from '../../models/elementConcrete'
 interface Props {
-  el: Shapes
+  el: ConcreteShape
   handleMove: (e: KonvaEventObject<DragEvent>, isLine?: boolean) => void
   handleEnlarge: (e: KonvaEventObject<Event>, isLine?: boolean) => void
 }
@@ -11,18 +10,24 @@ interface Props {
 const LineView = ({ el, handleMove, handleEnlarge }: Props) => {
   return (
     <Line
-      id={el.id.toString()}
+      id={el.getId().toString()}
       x={0}
       y={0}
-      points={[el.position.x, el.position.y, el.position.x + el.size.width, el.position.y + el.size.height]}
+      points={[
+        el.getPosition().x,
+        el.getPosition().y,
+        el.getPosition().x + el.getSize().width,
+        el.getPosition().y + el.getSize().height
+      ]}
       shadowBlur={10}
       shadowColor="lime"
-      shadowEnabled={el.selected ? true : false}
-      stroke={el.color}
+      shadowEnabled={el.getIsSelected() ? true : false}
+      stroke={el.getColor()}
       strokeWidth={5}
       onDragEnd={e => handleMove(e, true)}
       onTransformEnd={e => handleEnlarge(e, true)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

@@ -6,41 +6,39 @@ import text from '../../assets/text.svg'
 import image from '../../assets/image.svg'
 import line from '../../assets/line.svg'
 import Button from './Button'
-import CreatedComposite from '../../models/composite/created'
-import ElementFactory from '../../models/Elements/Factories/ElementFactory'
 import TextInput from './TextInput'
-
-interface ToolBarProps {
-  createdComposite: CreatedComposite
-}
+import ElementListSingleton from '../../models/handler'
+import { ConcreteFactory } from '../../models/factory'
+import { ELLIPSE, LINE, RECTANGLE } from '../../models/elementAbstract'
 
 let ID = 1
-const elementFactory = new ElementFactory()
 
-function ToolBar({ createdComposite }: ToolBarProps) {
+const factory = new ConcreteFactory()
+const elementListSingleton = ElementListSingleton.getInstance()
+
+function ToolBar() {
   const [input, setInput] = useState<string>('')
   const [textInputOpen, setTextInputOpen] = useState<boolean>(false)
   const imgInputRef = useRef<HTMLInputElement>(null)
 
   const createEllipse = () => {
-    const ellipse = elementFactory.createEllipse(ID++)
-    createdComposite.create(ellipse)
+    const ellipse = factory.createShape(ID++, ELLIPSE)
+    elementListSingleton.addElement(ellipse)
   }
 
   const createRectangle = () => {
-    const rectangle = elementFactory.createRectangle(ID++)
-    createdComposite.create(rectangle)
+    const rect = factory.createShape(ID++, RECTANGLE)
+    elementListSingleton.addElement(rect)
   }
 
   const createLine = () => {
-    const line = elementFactory.createLine(ID++)
-    createdComposite.create(line)
+    const line = factory.createShape(ID++, LINE)
+    elementListSingleton.addElement(line)
   }
 
   const createText = () => {
-    const text = elementFactory.createText(ID++)
-    text.content = input
-    createdComposite.create(text)
+    const text = factory.createText(ID++, input)
+    elementListSingleton.addElement(text)
   }
 
   const onLoadImg = (e: any) => {
@@ -49,10 +47,8 @@ function ToolBar({ createdComposite }: ToolBarProps) {
     const img = new Image()
     img.src = URL.createObjectURL(currentfiles[0])
     img.onload = () => {
-      const image = elementFactory.createImage(ID++)
-      image.url = img.src
-      image.size = { width: 150, height: 150 * (img.height / img.width) }
-      createdComposite.create(image)
+      const image = factory.createImage(ID++, img.src, { width: 150, height: 150 * (img.height / img.width) })
+      elementListSingleton.addElement(image)
     }
   }
 

@@ -1,9 +1,9 @@
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Rect } from 'react-konva'
-import { Shapes } from '../../models/Elements'
+import { ConcreteShape } from '../../models/elementConcrete'
 
 interface Props {
-  el: Shapes
+  el: ConcreteShape
   handleMove: (e: KonvaEventObject<DragEvent>) => void
   handleEnlarge: (e: KonvaEventObject<Event>) => void
 }
@@ -11,18 +11,19 @@ interface Props {
 const RectView = ({ el, handleMove, handleEnlarge }: Props) => {
   return (
     <Rect
-      id={el.id.toString()}
-      x={el.position.x}
-      y={el.position.y}
-      width={el.size.width}
-      height={el.size.height}
-      fill={el.color}
+      id={el.getId().toString()}
+      x={el.getPosition().x}
+      y={el.getPosition().y}
+      width={el.getSize().width}
+      height={el.getSize().height}
+      fill={el.getColor()}
       shadowBlur={10}
       shadowColor="lime"
-      shadowEnabled={el.selected ? true : false}
+      shadowEnabled={el.getIsSelected() ? true : false}
       onDragEnd={e => handleMove(e)}
       onTransformEnd={e => handleEnlarge(e)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

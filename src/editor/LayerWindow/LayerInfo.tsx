@@ -1,27 +1,33 @@
 import { Circle, Rectangle as RectIcon, Remove, Title, Image as ImageIcon } from '@mui/icons-material'
-import Elements from '../../models/Elements'
-import Ellipse from '../../models/Elements/Shapes/ellipse'
-import Rectangle from '../../models/Elements/Shapes/rectangle'
 import { Typography } from '@mui/material'
-import Line from '../../models/Elements/Shapes/line'
-import Text from '../../models/Elements/Text'
 
+import { ConcreteElement, ConcreteShape, ConcreteText } from '../../models/elementConcrete'
+import { ELLIPSE, LINE } from '../../models/elementAbstract'
 interface Props {
-  element: Elements
+  element: ConcreteElement
   isIcon?: boolean
 }
 
 function LayerInfo({ element, isIcon = false }: Props) {
-  if (element instanceof Ellipse) {
-    return isIcon ? <Circle sx={{ color: element.color }} /> : <Typography>{`Ellipse ${element.id}`}</Typography>
-  } else if (element instanceof Rectangle) {
-    return isIcon ? <RectIcon sx={{ color: element.color }} /> : <Typography>{`Rectangle ${element.id}`}</Typography>
-  } else if (element instanceof Line) {
-    return isIcon ? <Remove sx={{ color: element.color }} /> : <Typography>{`Line ${element.id}`}</Typography>
-  } else if (element instanceof Text) {
-    return isIcon ? <Title sx={{ color: element.color }} /> : <Typography>{`Text ${element.id}`}</Typography>
+  if (element instanceof ConcreteShape) {
+    const color = element.getColor()
+    const id = element.getId()
+
+    switch (element.getType()) {
+      case ELLIPSE: {
+        return isIcon ? <Circle sx={{ color }} /> : <Typography>{`Ellipse ${id}`}</Typography>
+      }
+      case LINE: {
+        return isIcon ? <Remove sx={{ color }} /> : <Typography>{`Line ${id}`}</Typography>
+      }
+      default: {
+        return isIcon ? <RectIcon sx={{ color }} /> : <Typography>{`Rectangle ${id}`}</Typography>
+      }
+    }
+  } else if (element instanceof ConcreteText) {
+    return isIcon ? <Title sx={{ color: element.getColor() }} /> : <Typography>{`Text ${element.getId()}`}</Typography>
   } else {
-    return isIcon ? <ImageIcon /> : <Typography>{`Image ${element.id}`}</Typography>
+    return isIcon ? <ImageIcon /> : <Typography>{`Image ${element.getId()}`}</Typography>
   }
 }
 
