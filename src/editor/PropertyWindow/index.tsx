@@ -1,7 +1,7 @@
 import { Box, Dialog, Divider, Grid, TextField, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { SketchPicker } from 'react-color'
-import ElementListSingleton from '../../models/singleton'
+import ElementListSingleton from '../../models/handler'
 import { ConcreteShape, ConcreteText } from '../../models/elementConcrete'
 import { PropertyWindowObserver } from '../../models/observer'
 

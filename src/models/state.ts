@@ -1,5 +1,5 @@
-import { ConcreteElement } from '../elementConcrete'
-import ElementListSingleton from '../singleton'
+import { ConcreteElement } from './elementConcrete'
+import ElementListSingleton from './handler'
 
 const elementListSingleton = ElementListSingleton.getInstance()
 // State 인터페이스
