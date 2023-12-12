@@ -14,29 +14,33 @@ import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Transformer } from 'react-konva'
 import { ConcreteImage, ConcreteShape, ConcreteText } from '../models/elementConcrete'
-import ElementListSingleton from '../models/singleton'
+import ElementList from '../models/singleton'
 import { ELLIPSE, RECTANGLE, DEFAULT_POS } from '../models/elementAbstract'
+import { EditorObserver } from '../models/observer'
 
 const keyboardState = new KeyboardState()
 
-const elementListSingleton = ElementListSingleton.getInstance()
+const elementList = ElementList.getInstance()
+const editorObserver = EditorObserver.getInstance()
 
 function Editor() {
   const layerRef = useRef<Konva.Layer | null>(null)
   const trRef = useRef<Konva.Transformer | null>(null)
 
-  const [updateShapes, setUpdateShapes] = useState(false)
+  const [render, setRerender] = useState(false)
 
-  elementListSingleton.setElementChangeListener(() => {
-    setUpdateShapes(!updateShapes)
-  })
+  useEffect(() => {
+    editorObserver.setRerenderMethod(() => {
+      setRerender(!render)
+    })
+  }, [render])
 
   const handleTransformer = () => {
     const layerRefCurrent = layerRef.current
 
-    if (elementListSingleton.getSelected()) {
+    if (elementList.getSelected()) {
       if (trRef.current && layerRefCurrent) {
-        const selectedIds = elementListSingleton.getSelected().map(el => el.getId())
+        const selectedIds = elementList.getSelected().map(el => el.getId())
         const selectedNodes = selectedIds.map(id => layerRefCurrent.findOne('#' + id)) as Node<NodeConfig>[]
 
         trRef.current.nodes(selectedNodes)
@@ -48,14 +52,14 @@ function Editor() {
   }
 
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
-    const element = elementListSingleton.getElements().find(el => el.getId() === parseInt(e.target.attrs.id))
+    const element = elementList.getElements().find(el => el.getId() === parseInt(e.target.attrs.id))
 
     keyboardState.handleClickElement(element)
     handleTransformer()
   }
 
   const handleMove = (e: KonvaEventObject<DragEvent>, isLine?: boolean) => {
-    const element = elementListSingleton.getSelected().find(el => el.getId() === parseInt(e.target.attrs.id))
+    const element = elementList.getSelected().find(el => el.getId() === parseInt(e.target.attrs.id))
     const movedX = (element?.getPosition().x || DEFAULT_POS.x) - e.target.getAttr('x')
     const movedY = (element?.getPosition().y || DEFAULT_POS.y) - e.target.getAttr('y')
 
@@ -68,14 +72,14 @@ function Editor() {
       e.currentTarget.y(0)
     }
 
-    elementListSingleton.updatePosition(element.getId(), {
+    elementList.updatePosition(element.getId(), {
       x: newX,
       y: newY
     })
   }
 
   const handleEnlarge = (e: KonvaEventObject<Event>, isLine?: boolean) => {
-    const element = elementListSingleton.getSelected().find(el => el.getId() === parseInt(e.target.attrs.id))
+    const element = elementList.getSelected().find(el => el.getId() === parseInt(e.target.attrs.id))
     if (!element) return
 
     if (isLine) {
@@ -89,7 +93,7 @@ function Editor() {
       const scale = e.currentTarget.scaleX()
       const newFontSize = element.getFontSize() * scale
 
-      elementListSingleton.updateFontSize(element.getId(), newFontSize)
+      elementList.updateFontSize(element.getId(), newFontSize)
     } else {
       const scaledX = e.currentTarget.scaleX()
       const scaledY = e.currentTarget.scaleY()
@@ -97,7 +101,7 @@ function Editor() {
       const newWidth = element.getSize().width * scaledX
       const newHeight = element.getSize().height * scaledY
 
-      elementListSingleton.updateSize(element.getId(), {
+      elementList.updateSize(element.getId(), {
         width: newWidth,
         height: newHeight
       })
@@ -149,7 +153,7 @@ function Editor() {
             onClick={e => handleClick(e)}
           >
             <Layer ref={layerRef}>
-              {elementListSingleton.getElements().map((el, idx) => {
+              {elementList.getElements().map((el, idx) => {
                 if (el instanceof ConcreteShape) {
                   if (el.getType() === ELLIPSE)
                     return <EllipseView el={el} handleMove={handleMove} handleEnlarge={handleEnlarge} key={idx} />

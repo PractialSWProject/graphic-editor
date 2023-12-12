@@ -1,18 +1,21 @@
 import { Box, Dialog, Divider, Grid, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SketchPicker } from 'react-color'
 import ElementListSingleton from '../../models/singleton'
 import { ConcreteShape, ConcreteText } from '../../models/elementConcrete'
+import { PropertyWindowObserver } from '../../models/observer'
 
 const elementListSingleton = ElementListSingleton.getInstance()
-
+const propertyObserver = PropertyWindowObserver.getInstance()
 function PropertyWindow() {
   const [isOpenPalette, setIsOpenPalette] = useState(false)
-  const [updateProperty, setUpdateProperty] = useState(false)
+  const [render, setRerender] = useState(false)
 
-  elementListSingleton.setPropertyWindowListener(() => {
-    setUpdateProperty(!updateProperty)
-  })
+  useEffect(() => {
+    propertyObserver.setRerenderMethod(() => {
+      setRerender(!render)
+    })
+  }, [render])
 
   const selected = elementListSingleton.getSelected()
 

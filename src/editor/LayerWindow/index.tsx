@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import LayerInfo from './LayerInfo'
 import { Box, Button, ButtonGroup, Typography, styled } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
@@ -7,22 +7,26 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import Konva from 'konva'
 import ElementListSingleton from '../../models/singleton'
 import { ConcreteElement } from '../../models/elementConcrete'
+import { LayerObserver } from '../../models/observer'
 
 interface Props {
   layerRef: React.MutableRefObject<any>
 }
 
 const elementListSingleton = ElementListSingleton.getInstance()
+const layerObserver = LayerObserver.getInstance()
 
 const LayerWindow = ({ layerRef }: Props) => {
   const createdElements = elementListSingleton.getElements()
   const layerRefCurrent = layerRef.current
 
-  const [updateLayers, setUpdateLayers] = useState(false)
+  const [render, setRerender] = useState(false)
 
-  elementListSingleton.setLayerChangeListener(() => {
-    setUpdateLayers(!updateLayers)
-  })
+  useEffect(() => {
+    layerObserver.setRerenderMethod(() => {
+      setRerender(!render)
+    })
+  }, [render])
 
   let rows = createdElements.map((el, index) => ({
     id: el.getId(),

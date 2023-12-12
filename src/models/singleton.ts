@@ -1,30 +1,35 @@
-// elementListSingleton.ts
 import { Position, Size } from './elementAbstract'
 import { ConcreteElement, ConcreteShape, ConcreteText } from './elementConcrete'
+import { LayerObserver, EditorObserver, PropertyWindowObserver, Observer } from './observer'
 
-type ChangeListener = () => void
-
-class ElementListSingleton {
-  private static instance: ElementListSingleton
+const layerObserver = LayerObserver.getInstance()
+const editorObserver = EditorObserver.getInstance()
+const propertyWindowObserver = PropertyWindowObserver.getInstance()
+class ElementListHandler {
+  private static instance: ElementListHandler
   private elements: ConcreteElement[] = []
   private selected: ConcreteElement[] = []
 
   private constructor() {}
 
-  private elementChangeListener: ChangeListener | null = null
-  private layerChangeListener: ChangeListener | null = null
-  private propertyWindowListener: ChangeListener | null = null
+  private observers: Observer[] = [layerObserver, editorObserver, propertyWindowObserver]
 
-  public static getInstance(): ElementListSingleton {
-    if (!ElementListSingleton.instance) {
-      ElementListSingleton.instance = new ElementListSingleton()
+  public notify(): void {
+    for (const observer of this.observers) {
+      observer.update()
     }
-    return ElementListSingleton.instance
+  }
+
+  public static getInstance(): ElementListHandler {
+    if (!ElementListHandler.instance) {
+      ElementListHandler.instance = new ElementListHandler()
+    }
+    return ElementListHandler.instance
   }
 
   public addElement(element: ConcreteElement): void {
     this.elements.push(element)
-    this.notifyEditorAndLayerChanges()
+    this.notify()
   }
 
   public getElements(): ConcreteElement[] {
@@ -34,15 +39,13 @@ class ElementListSingleton {
   public select(element: ConcreteElement): void {
     this.selected.push(element)
     element.setIsSelected(true)
-
-    this.notifyAllChanges()
+    this.notify()
   }
 
   public deselect(element: ConcreteElement): void {
     this.selected = this.selected.filter(el => el.getId() !== element.getId())
     element.setIsSelected(false)
-
-    this.notifyAllChanges()
+    this.notify()
   }
 
   public deselectAll(): void {
@@ -50,8 +53,7 @@ class ElementListSingleton {
       element.setIsSelected(false)
     })
     this.selected = []
-
-    this.notifyAllChanges()
+    this.notify()
   }
 
   public isInSelectionManager(element: ConcreteElement): boolean {
@@ -70,7 +72,7 @@ class ElementListSingleton {
         element.setPosition(position)
       }
     })
-    this.notifyEditorAndPropertyWindowChanges()
+    this.notify()
   }
 
   public updateSize(id: number, size: Size): void {
@@ -79,7 +81,7 @@ class ElementListSingleton {
         element.setSize(size)
       }
     })
-    this.notifyEditorAndPropertyWindowChanges()
+    this.notify()
   }
 
   public updateColor(id: number, color: string): void {
@@ -88,7 +90,7 @@ class ElementListSingleton {
         element.setColor(color)
       }
     })
-    this.notifyEditorAndPropertyWindowChanges()
+    this.notify()
   }
 
   public updateFontSize(id: number, fontSize: number): void {
@@ -97,7 +99,7 @@ class ElementListSingleton {
         element.setFontSize(fontSize)
       }
     })
-    this.notifyEditorAndPropertyWindowChanges()
+    this.notify()
   }
 
   public updateZIndex(id: number, zIndex: number): void {
@@ -106,57 +108,8 @@ class ElementListSingleton {
         element.setZIndex(zIndex)
       }
     })
-    this.notifyEditorAndLayerChanges()
-  }
-
-  // listeners
-  public setElementChangeListener(listener: ChangeListener): void {
-    this.elementChangeListener = listener
-  }
-
-  public setLayerChangeListener(listener: ChangeListener): void {
-    this.layerChangeListener = listener
-  }
-
-  public setPropertyWindowListener(listener: ChangeListener): void {
-    this.propertyWindowListener = listener
-  }
-
-  private notifyPropertyWindowChanges() {
-    if (this.propertyWindowListener) {
-      this.propertyWindowListener()
-    }
-  }
-
-  private notifyLayerChanges() {
-    if (this.layerChangeListener) {
-      this.layerChangeListener()
-    }
-  }
-
-  private notifyElementChanges() {
-    this.notifyLayerChanges()
-
-    if (this.elementChangeListener) {
-      this.elementChangeListener()
-    }
-  }
-
-  private notifyEditorAndLayerChanges() {
-    this.notifyElementChanges()
-    this.notifyLayerChanges()
-  }
-
-  private notifyEditorAndPropertyWindowChanges() {
-    this.notifyElementChanges()
-    this.notifyPropertyWindowChanges()
-  }
-
-  private notifyAllChanges() {
-    this.notifyElementChanges()
-    this.notifyLayerChanges()
-    this.notifyPropertyWindowChanges()
+    this.notify()
   }
 }
 
-export default ElementListSingleton
+export default ElementListHandler
