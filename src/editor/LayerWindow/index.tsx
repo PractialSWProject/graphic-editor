@@ -8,6 +8,7 @@ import Konva from 'konva'
 import ElementListSingleton from '../../models/singleton'
 import { ConcreteElement } from '../../models/elementConcrete'
 import { LayerObserver } from '../../models/observer'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 interface Props {
   layerRef: React.MutableRefObject<any>
@@ -35,7 +36,8 @@ const LayerWindow = ({ layerRef }: Props) => {
     name: el,
     zIndex: el.getZIndex(),
     zIndexChange: el,
-    isSelected: el.getIsSelected()
+    isSelected: el.getIsSelected(),
+    visibility: el
   }))
 
   rows = rows.sort((a, b) => b.zIndex - a.zIndex)
@@ -73,6 +75,10 @@ const LayerWindow = ({ layerRef }: Props) => {
 
   const handleZIndexDown = (element: ConcreteElement) => {
     handleZIndexChange(element, 'down')
+  }
+
+  const handleVisibility = (element: ConcreteElement) => {
+    elementListSingleton.updateVisibility(element.getId())
   }
 
   // const handleClickRow: (params: GridRowParams) => void = params => {
@@ -119,6 +125,21 @@ const LayerWindow = ({ layerRef }: Props) => {
               <KeyboardArrowDownIcon />
             </Button>
           </ButtonGroup>
+        </Box>
+      )
+    },
+    {
+      field: 'visibility',
+      width: 100,
+      renderCell: (params: GridRenderCellParams<{ id: number; shape: ConcreteElement; rowId: number }>) => (
+        <Box>
+          <Button onClick={() => handleVisibility(params.value)}>
+            {params.value.getIsVisible() ? (
+              <Visibility sx={{ color: 'darkgray' }} />
+            ) : (
+              <VisibilityOff sx={{ color: 'lightgray' }} />
+            )}
+          </Button>
         </Box>
       )
     }

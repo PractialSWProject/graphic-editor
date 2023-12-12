@@ -14,6 +14,7 @@ export abstract class ConcreteElement implements AbstractElement {
   protected position: Position
   protected size: Size
   protected zIndex: number
+  protected isVisible: boolean = true
 
   constructor(id: number, position: Position, size: Size, zIndex: number, isSelected: boolean = false) {
     this.id = id
@@ -44,6 +45,10 @@ export abstract class ConcreteElement implements AbstractElement {
     return this.zIndex
   }
 
+  getIsVisible(): boolean {
+    return this.isVisible
+  }
+
   // Setters
   setIsSelected(isSelected: boolean): void {
     this.isSelected = isSelected
@@ -58,6 +63,10 @@ export abstract class ConcreteElement implements AbstractElement {
 
   setZIndex(zIndex: number): void {
     this.zIndex = zIndex
+  }
+
+  setIsVisible(isVisible: boolean): void {
+    this.isVisible = isVisible
   }
 }
 

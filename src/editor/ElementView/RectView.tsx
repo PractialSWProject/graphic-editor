@@ -19,10 +19,11 @@ const RectView = ({ el, handleMove, handleEnlarge }: Props) => {
       fill={el.getColor()}
       shadowBlur={10}
       shadowColor="lime"
-      shadowEnabled={el.getIsSelected()? true : false}
+      shadowEnabled={el.getIsSelected() ? true : false}
       onDragEnd={e => handleMove(e)}
       onTransformEnd={e => handleEnlarge(e)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

@@ -9,7 +9,6 @@ interface Props {
 }
 
 const EllipseView = ({ el, handleMove, handleEnlarge }: Props) => {
-
   return (
     <EllipseK
       id={el.getId().toString()}
@@ -26,6 +25,7 @@ const EllipseView = ({ el, handleMove, handleEnlarge }: Props) => {
       onDragEnd={e => handleMove(e)}
       onTransformEnd={e => handleEnlarge(e)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

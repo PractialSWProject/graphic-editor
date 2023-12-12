@@ -110,6 +110,15 @@ class ElementListHandler {
     })
     this.notify()
   }
+
+  public updateVisibility(id: number): void {
+    this.elements.forEach(element => {
+      if (element.getId() === id) {
+        element.setIsVisible(!element.getIsVisible())
+      }
+    })
+    this.notify()
+  }
 }
 
 export default ElementListHandler

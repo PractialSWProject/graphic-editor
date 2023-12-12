@@ -27,6 +27,7 @@ const LineView = ({ el, handleMove, handleEnlarge }: Props) => {
       onDragEnd={e => handleMove(e, true)}
       onTransformEnd={e => handleEnlarge(e, true)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

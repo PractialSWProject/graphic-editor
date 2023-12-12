@@ -23,6 +23,7 @@ const TextView = ({ el, handleMove, handleEnlarge }: Props) => {
       onDragEnd={e => handleMove(e)}
       onTransformEnd={e => handleEnlarge(e, false)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }

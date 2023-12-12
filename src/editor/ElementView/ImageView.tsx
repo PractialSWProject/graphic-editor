@@ -26,6 +26,7 @@ const ImageView = ({ el, handleMove, handleEnlarge }: Props) => {
       onDragEnd={e => handleMove(e)}
       onTransformEnd={e => handleEnlarge(e)}
       draggable
+      visible={el.getIsVisible()}
     />
   )
 }
